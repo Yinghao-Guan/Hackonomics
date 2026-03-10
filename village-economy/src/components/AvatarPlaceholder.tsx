@@ -1,9 +1,12 @@
 // src/components/AvatarPlaceholder.tsx
 export default function AvatarPlaceholder({ label }: { label: string }) {
     return (
-        <div className="flex flex-col items-center gap-2">
-            <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 ring-1 ring-white/10" />
-            <div className="text-xs text-white/70">{label}</div>
+        <div className="h-[350px] w-[250px]">
+            <div className="w-full h-full rounded-2xl bg-gradient-to-b from-white/15 via-white/8 to-transparent ring-1 ring-white/15 shadow-2xl relative">
+                <div className="absolute bottom-0 left-0 right-0 rounded-b-2xl bg-black/50 py-2 text-center text-sm font-semibold text-white/90">
+                    {label}
+                </div>
+            </div>
         </div>
     );
 }

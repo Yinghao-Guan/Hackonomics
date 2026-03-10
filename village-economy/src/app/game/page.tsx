@@ -7,6 +7,8 @@ import TopBar from "@/components/TopBar";
 import DialogueCard from "@/components/DialogueCard";
 import LogDrawer from "@/components/LogDrawer";
 import AchievementToast from "@/components/AchievementToast";
+import AvatarPlaceholder from "@/components/AvatarPlaceholder";
+import ChoiceOverlay from "@/components/ChoiceOverlay";
 import { NODES, START_NODE_ID, type ChoiceNode, type DialogueNode } from "@/lib/nodes";
 import { loadFromStorage, saveToStorage, clearStorage } from "@/lib/storage";
 import { newGameState, type GameState } from "@/lib/gameState";
@@ -88,109 +90,52 @@ export default function GamePage() {
 
         if (result.lastAchievementId) {
             setToastAchId(result.lastAchievementId);
-            // auto hide
             window.setTimeout(() => setToastAchId(null), 3500);
         }
     };
 
     return (
-        <main className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 text-white">
-            <LogDrawer open={logOpen} onToggle={() => setLogOpen((v) => !v)} log={state.log} />
-            <AchievementToast achievement={latestAchievement} onClose={() => setToastAchId(null)} />
+        <main className="relative w-full h-screen overflow-hidden bg-zinc-950 text-white">
+            {/* Layer 0: Background scene */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-900 via-zinc-900 to-zinc-950" />
 
-            <div className="mx-auto max-w-5xl px-6 py-10">
-                <div className="mb-6 flex items-start justify-between gap-4">
-                    <div>
-                        <div className="text-sm text-white/60">Village Economy</div>
-                        <div className="text-2xl font-bold tracking-tight">Chapter: Awakening</div>
-                    </div>
-
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setState(newGameState(START_NODE_ID))}
-                            className="rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 hover:bg-white/10"
-                        >
-                            New Game
-                        </button>
-                        <button
-                            onClick={() => {
-                                clearStorage();
-                                setState(newGameState(START_NODE_ID));
-                            }}
-                            className="rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 hover:bg-white/10"
-                        >
-                            Clear Save
-                        </button>
-                    </div>
-                </div>
-
-                <div className="mb-6">
-                    <TopBar stats={state.stats} />
-                </div>
-
-                <div className="grid gap-6 lg:grid-cols-[1fr,340px]">
-                    <div>
-                        <DialogueCard speaker={node.speaker} lines={normalizeLines(node.text)}>
-                            {node.type === "dialogue" ? (
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={onContinue}
-                                        className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-white/90"
-                                    >
-                                        继续
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {(node as ChoiceNode).choices.map((c) => (
-                                        <button
-                                            key={c.key}
-                                            onClick={() => onChoose(c.key)}
-                                            className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-left hover:bg-white/10"
-                                        >
-                                            <div className="flex items-center justify-between gap-3">
-                                                <div className="text-base font-semibold text-white">
-                                                    {c.key}. {c.title}
-                                                </div>
-                                                <div className="text-xs text-white/50">点击选择</div>
-                                            </div>
-                                            {c.description && <div className="mt-2 text-sm text-white/70">{c.description}</div>}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </DialogueCard>
-                    </div>
-
-                    <aside className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                        <div className="text-sm font-semibold text-white">本局记录</div>
-
-                        <div className="mt-4 space-y-3">
-                            <div className="rounded-2xl bg-black/30 p-4">
-                                <div className="text-xs text-white/60">已解锁成就</div>
-                                <div className="mt-1 text-2xl font-bold">{state.achievements.length}</div>
-                            </div>
-
-                            <div className="rounded-2xl bg-black/30 p-4">
-                                <div className="text-xs text-white/60">已做选择</div>
-                                <div className="mt-1 text-2xl font-bold">{Object.keys(state.choices).length}</div>
-                            </div>
-
-                            <div className="rounded-2xl bg-black/30 p-4">
-                                <div className="text-xs text-white/60">当前节点</div>
-                                <div className="mt-1 break-all font-mono text-xs text-white/80">{state.currentNodeId}</div>
-                            </div>
-
-                            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
-                                <div className="font-semibold text-white">占位提示</div>
-                                <div className="mt-1">
-                                    没有美术
-                                </div>
-                            </div>
-                        </div>
-                    </aside>
-                </div>
+            {/* Layer 1: Character sprite — centered upper area */}
+            <div className="absolute inset-0 z-10 flex items-center justify-center" style={{ paddingBottom: "32vh" }}>
+                <AvatarPlaceholder label={node.speaker} />
             </div>
+
+            {/* Layer 4: Stats HUD (self-positions as fixed) */}
+            <TopBar
+                stats={state.stats}
+                logOpen={logOpen}
+                onToggleLog={() => setLogOpen((v) => !v)}
+                onNewGame={() => setState(newGameState(START_NODE_ID))}
+                onClear={() => {
+                    clearStorage();
+                    setState(newGameState(START_NODE_ID));
+                }}
+            />
+
+            {/* Layer 2: Dialogue box (self-positions as fixed bottom) */}
+            <DialogueCard speaker={node.speaker} lines={normalizeLines(node.text)}>
+                {node.type === "dialogue" && (
+                    <button
+                        onClick={onContinue}
+                        className="absolute bottom-4 right-6 text-2xl text-white/60 hover:text-white animate-pulse"
+                    >
+                        ▶
+                    </button>
+                )}
+            </DialogueCard>
+
+            {/* Layer 3: Choice overlay */}
+            {node.type === "choice" && (
+                <ChoiceOverlay choices={(node as ChoiceNode).choices} onChoose={onChoose} />
+            )}
+
+            {/* Layer 5: Overlays */}
+            <LogDrawer open={logOpen} log={state.log} />
+            <AchievementToast achievement={latestAchievement} onClose={() => setToastAchId(null)} />
         </main>
     );
 }

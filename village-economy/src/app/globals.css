@@ -24,3 +24,9 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes vn-text-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes vn-slide-up { from { opacity: 0; transform: translateY(16px) } to { opacity: 1; transform: translateY(0) } }
+
+@utility animate-vn-text-in { animation: vn-text-in 0.3s ease; }
+@utility animate-vn-slide-up { animation: vn-slide-up 0.25s ease; }
