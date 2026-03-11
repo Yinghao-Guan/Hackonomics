@@ -1,5 +1,6 @@
 // src/app/page.tsx
 import Link from "next/link";
+import WanderingVillager from '@/components/Villager';
 
 export default function Home() {
   return (
@@ -37,6 +38,15 @@ export default function Home() {
             </ul>
           </div>
         </div>
+        <WanderingVillager />
+        <WanderingVillager />
+        <WanderingVillager />
+        <WanderingVillager />
+        <WanderingVillager />
+        <WanderingVillager />
+        <WanderingVillager />
+        <WanderingVillager />
+        <WanderingVillager />
       </main>
   );
 }

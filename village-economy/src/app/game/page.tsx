@@ -13,6 +13,7 @@ import { NODES, START_NODE_ID, type ChoiceNode, type DialogueNode } from "@/lib/
 import { loadFromStorage, saveToStorage, clearStorage } from "@/lib/storage";
 import { newGameState, type GameState } from "@/lib/gameState";
 import { applyEffects } from "@/lib/engine";
+import WanderingVillager from '@/components/Villager';
 
 function normalizeLines(text: string | string[]) {
     return Array.isArray(text) ? text : [text];
@@ -136,6 +137,15 @@ export default function GamePage() {
             {/* Layer 5: Overlays */}
             <LogDrawer open={logOpen} log={state.log} />
             <AchievementToast achievement={latestAchievement} onClose={() => setToastAchId(null)} />
+            <WanderingVillager />
+            <WanderingVillager />
+            <WanderingVillager />
+            <WanderingVillager />
+            <WanderingVillager />
+            <WanderingVillager />
+            <WanderingVillager />
+            <WanderingVillager />
+            <WanderingVillager />
         </main>
     );
 }
