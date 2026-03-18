@@ -47,7 +47,7 @@ export type ChoiceNode = {
     choices: Array<{
         key: ChoiceKey;
         title: string;
-        description?: string;
+        // description?: string;
         effects: Effect[];
     }>;
 };
@@ -115,7 +115,7 @@ export const NODES: Record<string, Node> = {
             {
                 key: "A",
                 title: "平均分配 (所有人分到 0.9kg)",
-                description: "马克思主义流派：倾向结果均等。所有人轻微饥饿，没有人被放弃。", 
+                // description: "马克思主义流派：倾向结果均等。所有人轻微饥饿，没有人被放弃。", 
                 effects: [
                     { type: "set", key: "foodStock", value: 0 }, 
                     { type: "add", key: "productivity", value: -5 },
@@ -132,7 +132,7 @@ export const NODES: Record<string, Node> = {
             {
                 key: "B",
                 title: "优先劳动力 (老人小孩断粮)", 
-                description: "新古典经济学：追求资源最优配置。牺牲非生产性人口保全未来产出。",
+                // description: "新古典经济学：追求资源最优配置。牺牲非生产性人口保全未来产出。",
                 effects: [
                     { type: "set", key: "foodStock", value: 0 }, 
                     { type: "add", key: "happiness", value: -15 }, 
@@ -150,7 +150,7 @@ export const NODES: Record<string, Node> = {
             {
                 key: "C",
                 title: "不做干预 (由村民自行争抢)", 
-                description: "奥地利学派：相信个体博弈与自发秩序。结果不可预测。", 
+                // description: "奥地利学派：相信个体博弈与自发秩序。结果不可预测。", 
                 effects: [
                     { type: "set", key: "foodStock", value: 0 },
                     { type: "add", key: "productivity", value: -3 }, 
