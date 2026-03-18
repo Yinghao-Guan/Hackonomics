@@ -4,14 +4,12 @@ import type { GameState } from "./gameState";
 import { clampStats } from "./gameState";
 import { GameStats } from "./nodes";
 
-// ==========================================
-// 核心：宏观经济动态联立方程组 (The Invisible Hand)
-// ==========================================
+// Macro economic calculation
 function recalculateMacroEconomics(stats: GameStats): GameStats {
     let next = { ...stats };
 
-    // 1. 失业率计算 (Unemployment Rate)
-    // 假设总人口的 60% 是适龄劳动力 [cite: 29, 30]
+    // Unemployment Rate
+    // 假设总人口的 60% 是适龄劳动力
     const laborForce = Math.floor(next.population * 0.6);
     // 假设当前生产力需要的工作岗位数量 (10点productivity需要1个人)
     const jobsAvailable = Math.floor(next.productivity / 10);
@@ -19,15 +17,15 @@ function recalculateMacroEconomics(stats: GameStats): GameStats {
     next.unemploymentRate = laborForce > 0 ? Math.round((unemployed / laborForce) * 100) : 0;
 
     // 2. 幸福度计算 (Happiness / Marginal Utility)
-    // 基于边际效用理论：吃饱涨幅大，吃撑了没感觉 [cite: 32]
+    // 基于边际效用理论
     const foodPerCapita = next.population > 0 ? next.foodStock / next.population : 0;
     let targetHappiness = 50; 
     
-    if (foodPerCapita >= 1) targetHappiness += 20; // 满足温饱生存线 [cite: 32]
-    if (foodPerCapita >= 2) targetHappiness += 10; // 边际效用递减 [cite: 32]
-    if (foodPerCapita < 1) targetHappiness -= 40;  // 饥饿导致幸福度断崖下跌 [cite: 31, 32]
+    if (foodPerCapita >= 1) targetHappiness += 20; // 满足温饱生存线 
+    if (foodPerCapita >= 2) targetHappiness += 10; // 边际效用递减 
+    if (foodPerCapita < 1) targetHappiness -= 40;  // 饥饿导致幸福度断崖下跌 
 
-    // 失业率的负外部性惩罚 [cite: 31]
+    // 失业率的负外部性惩罚 
     targetHappiness -= Math.floor(next.unemploymentRate * 0.5); 
     
     // 让幸福度平滑过渡，而不是瞬间暴涨暴跌
