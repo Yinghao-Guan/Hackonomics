@@ -81,7 +81,7 @@ export default function Home() {
         }`}
         style={{ 
           // 找了一张很有质感的木屋内部的图作为占位背景
-          backgroundImage: "url('https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=2070&auto=format&fit=crop')" 
+          backgroundImage: "url('/room.png')" 
         }}
       />
       

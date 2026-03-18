@@ -13,18 +13,21 @@ export type GameStats = {
     foodStock: number;
     population: number;
     happiness: number;
-    productivity: number; // 0~200 (just a simple scale)
+    productivity: number; 
     season: number;
     day: number;
     actionPoints: number;
 };
 
+// 带有视觉表现的节点定义
 export type DialogueNode = {
     id: string;
     type: "dialogue";
     speaker: string;
     text: string | string[];
     next: string;
+    avatar?: string; 
+    bg?: "black" | "room" | "village"; 
 };
 
 export type ChoiceNode = {
@@ -32,6 +35,8 @@ export type ChoiceNode = {
     type: "choice";
     speaker: string;
     text: string | string[];
+    avatar?: string;
+    bg?: "black" | "room" | "village";
     choices: Array<{
         key: ChoiceKey;
         title: string;
@@ -42,218 +47,135 @@ export type ChoiceNode = {
 
 export type Node = DialogueNode | ChoiceNode;
 
-export const START_NODE_ID = "intro_001";
+export const START_NODE_ID = "event1_start";
 
 export const INITIAL_STATS: GameStats = {
-    money: 100,
-    foodStock: 18,
-    population: 20,
-    happiness: 60,
+    money: 5000,
+    foodStock: 18,  
+    population: 20, 
+    happiness: 70,
     productivity: 100,
     season: 1,
     day: 1,
     actionPoints: 3,
 };
 
-// 你的朋友写的剧情 + 事件一（MVP）
-// 说明：这里的“黑屏/渐亮”等视觉效果先用文本 + 占位UI表达
 export const NODES: Record<string, Node> = {
-    intro_001: {
-        id: "intro_001",
-        type: "dialogue",
-        speaker: "（黑屏）",
-        text: "你在一个陌生的房间醒来。耳边传来几个大妈大婶的嘀咕声。",
-        next: "intro_002",
+
+    // 事件一
+    event1_start: {
+        id: "event1_start", type: "dialogue", speaker: "村民A", avatar: "👨‍🌾", bg: "room",
+        text: "（门被猛地推开）不好了村长！粮仓里的粮食……不够所有人分了！", 
+        next: "event1_prophet",
     },
-    intro_002: {
-        id: "intro_002",
-        type: "dialogue",
-        speaker: "大妈们",
-        text: ["大妈一：昨天不是还好好的？", "大妈二：可不是嘛。", "大妈三：会不会……脑子坏了？"],
-        next: "intro_003",
+    event1_prophet: {
+        id: "event1_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        text: "欢迎上任，村长。顺带一提：冬天快到了。", 
+        next: "event1_dialogue_1",
     },
-    intro_003: {
-        id: "intro_003",
-        type: "dialogue",
-        speaker: "（画面渐亮）",
-        text: "你睁开眼，一头驴的大脸占据了你的视野。它静静看着你，两秒后开口说话。",
-        next: "intro_004",
+    event1_dialogue_1: {
+        id: "event1_dialogue_1", type: "dialogue", speaker: "村民一（老人）", avatar: "👴", bg: "village",
+        text: "我们年纪大了，少吃点也没事，把粮食留给年轻人吧……", 
+        next: "event1_dialogue_2",
     },
-    intro_004: {
-        id: "intro_004",
-        type: "dialogue",
-        speaker: "驴",
-        text: "（叹气）你终于醒了。",
-        next: "intro_005",
+    event1_dialogue_2: {
+        id: "event1_dialogue_2", type: "dialogue", speaker: "村民二（壮年）", avatar: "💪", bg: "village",
+        text: "要是我们没力气干活，下个季节咱们全村都得饿死！必须保住干活的人！",  
+        next: "event1_dialogue_3",
     },
-    intro_005: {
-        id: "intro_005",
-        type: "dialogue",
-        speaker: "你（内心）",
-        text: "这是哪里？我是不是吃坏东西了？不对！驴怎么会说话！",
-        next: "intro_006",
+    event1_dialogue_3: {
+        id: "event1_dialogue_3", type: "dialogue", speaker: "村民三（孩子）", avatar: "👧", bg: "village",
+        text: "妈妈……我们要饿肚子了吗？",  
+        next: "event1_prophet_2",
     },
-    intro_006: {
-        id: "intro_006",
-        type: "dialogue",
-        speaker: "你",
-        text: "你……刚刚是说话了？",
-        next: "intro_007",
-    },
-    intro_007: {
-        id: "intro_007",
-        type: "dialogue",
-        speaker: "驴",
-        text: "比起这个，你还是关心下自己在哪吧。",
-        next: "intro_008",
-    },
-    intro_008: {
-        id: "intro_008",
-        type: "dialogue",
-        speaker: "大妈们（小声）",
-        text: ["大妈一：他又开始自言自语了。", "大妈三：我就说吧，脑子坏了。", "大妈二：那还当不当村长了？"],
-        next: "intro_009",
-    },
-    intro_009: {
-        id: "intro_009",
-        type: "dialogue",
-        speaker: "你",
-        text: "村长？",
-        next: "intro_010",
-    },
-    intro_010: {
-        id: "intro_010",
-        type: "dialogue",
-        speaker: "驴",
-        text: "简单来说：这个村子快撑不下去了。他们连最简单的算术都算不明白，而你这个外来者成了他们的希望。",
-        next: "intro_011",
-    },
-    intro_011: {
-        id: "intro_011",
-        type: "dialogue",
-        speaker: "系统",
-        text: "成就解锁：《关于我转生后变成村长这件事》（That Time I Got Reincarnated as a 村长）",
-        next: "intro_012",
-    },
-    intro_012: {
-        id: "intro_012",
-        type: "dialogue",
-        speaker: "你",
-        text: "你到底是谁？",
-        next: "intro_013",
-    },
-    intro_013: {
-        id: "intro_013",
-        type: "dialogue",
-        speaker: "驴",
-        text: "我叫立（Prophet）。你可以当我是你的幻觉——如果你承认你脑子坏了的话。你接下来做的每个决定，我都会记下来。",
-        next: "intro_014",
-    },
-    intro_014: {
-        id: "intro_014",
-        type: "dialogue",
-        speaker: "（门被推开）村民A",
-        text: "不好了！粮仓不够分了！",
-        next: "intro_015",
-    },
-    intro_015: {
-        id: "intro_015",
-        type: "dialogue",
-        speaker: "立（Prophet）",
-        text: "欢迎醒来。顺带一提：冬天快到了。",
-        next: "event1_001",
+    event1_prophet_2: {
+        id: "event1_prophet_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        text: "有时候，不做选择本身也是一种选择。现在的库存只有 18kg，刚好够 18 个人活命。而你们有 20 张嘴。选吧，村长。", 
+        next: "event1_choice",
     },
 
-    // 事件一：粮食不足（三选一）
-    event1_001: {
-        id: "event1_001",
-        type: "choice",
-        speaker: "立（Prophet）",
-        text: [
-            "村民们发现粮仓里的粮食不够所有人度过这个季节。",
-            "当前小麦库存：18kg；人口：20；最低需求：1kg/人。",
-            "立：有时候，不做选择本身也是一种选择。",
-        ],
+    // 真正的抉择节点
+    event1_choice: {
+        id: "event1_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        text: "（当前小麦：18kg | 人口：20人 | 维持生命最低需求：1kg/人）",
         choices: [
             {
                 key: "A",
-                title: "每个人分到同样的食物",
-                description: "所有人轻微饥饿，没有人被特别对待。",
+                title: "平均分配 (所有人分到 0.9kg)",
+                description: "马克思主义流派：倾向结果均等。所有人轻微饥饿，没有人被放弃。", 
                 effects: [
-                    { type: "set", key: "foodStock", value: 0 },
+                    { type: "set", key: "foodStock", value: 0 }, 
                     { type: "add", key: "productivity", value: -5 },
                     {
                         type: "achievement",
                         id: "ach_shared_hardship",
-                        title: "同甘共苦",
-                        description: "你选择让所有人一起撑过去。",
+                        title: "同甘共苦", 
+                        description: "你选择让所有人一起撑过去。但在绝对稀缺下，平均分配导致了整体效率的下滑。",
                     },
-                    { type: "log", text: "事件一：选择A（平分粮食）" },
+                    { type: "log", text: "事件一：平均分配，全员轻微饥饿，生产力下降。" },
                     { type: "goto", nodeId: "event1_ending" },
                 ],
             },
             {
                 key: "B",
-                title: "确保能干活的人吃饱",
-                description: "劳动者稳定，老人小孩饥饿。",
+                title: "优先劳动力 (老人小孩断粮)", 
+                description: "新古典经济学：追求资源最优配置。牺牲非生产性人口保全未来产出。",
                 effects: [
-                    { type: "set", key: "foodStock", value: 0 },
-                    { type: "add", key: "happiness", value: -5 },
-                    { type: "add", key: "population", value: -2 },
+                    { type: "set", key: "foodStock", value: 0 }, 
+                    { type: "add", key: "happiness", value: -15 }, 
+                    { type: "add", key: "population", value: -2 }, 
                     {
                         type: "achievement",
                         id: "ach_optimal_question",
                         title: "最优解？",
-                        description: "你把未来，放在了现在之前。",
+                        description: "你把未来，放在了现在之前。效用最大化原则在极端情况下的冷血体现。", 
                     },
-                    { type: "log", text: "事件一：选择B（劳动者优先）" },
+                    { type: "log", text: "事件一：优先劳动力，老人小孩牺牲，幸福度大跌。" },
                     { type: "goto", nodeId: "event1_ending" },
                 ],
             },
             {
                 key: "C",
-                title: "不做干预",
-                description: "依赖个人选择，结果不可预测。",
+                title: "不做干预 (由村民自行争抢)", 
+                description: "奥地利学派：相信个体博弈与自发秩序。结果不可预测。", 
                 effects: [
                     { type: "set", key: "foodStock", value: 0 },
-                    // MVP先用固定值代替随机（避免demo不稳定）；你想要随机我也能马上改
-                    { type: "add", key: "productivity", value: -3 },
-                    { type: "add", key: "happiness", value: -3 },
-                    { type: "add", key: "population", value: -1 },
+                    { type: "add", key: "productivity", value: -3 }, 
+                    { type: "add", key: "happiness", value: -8 },
+                    { type: "add", key: "population", value: -1 }, 
                     {
                         type: "achievement",
                         id: "ach_free_or_escape",
                         title: "自由 or 逃避",
-                        description: "你选择了不替任何人做决定。",
+                        description: "你选择了不替任何人做决定。体会哈耶克式自发秩序的代价吧。", 
                     },
-                    { type: "log", text: "事件一：选择C（不干预）" },
+                    { type: "log", text: "事件一：不干预，引发轻度骚乱，结果差强人意。" },
                     { type: "goto", nodeId: "event1_ending" },
                 ],
             },
         ],
     },
 
+    // 总结与教学
     event1_ending: {
-        id: "event1_ending",
-        type: "dialogue",
-        speaker: "立（Prophet）",
-        text: "你做出选择的那一刻，你便放弃了别的某种东西——这就是 opportunity cost。",
+        id: "event1_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        text: "做完决定了？很好。", 
+        next: "event1_ending_2",
+    },
+    event1_ending_2: {
+        id: "event1_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        text: "请记住刚才的感觉。你做出选择的那一刻，你便永远地放弃了别的某种东西。在经济学里，这叫【机会成本 (Opportunity Cost)】。", 
         next: "season_end",
     },
 
     season_end: {
-        id: "season_end",
-        type: "dialogue",
-        speaker: "系统",
-        text: "季末结算（MVP）：点击继续进入下一季。",
+        id: "season_end", type: "dialogue", speaker: "（系统）", bg: "black",
+        text: "【第一季 结束】\n由于你的决策，村庄的各项指标已发生不可逆的变动。", 
         next: "season_start",
     },
-
     season_start: {
-        id: "season_start",
-        type: "dialogue",
-        speaker: "立（Prophet）",
-        text: "新的一季开始了。你会继续用“理性”做决定吗？",
-        next: "event1_001", // MVP先循环回事件一，方便演示；之后换成事件二
+        id: "season_start", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        text: "恭喜熬过第一季。但别高兴得太早，春天的“丰收”，有时候比冬天的饥荒更可怕。敬请期待事件二吧。", 
+        next: "event1_start", // MVP 演示完毕，先循环回事件一开头方便测试
     },
 };
