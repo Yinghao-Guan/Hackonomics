@@ -9,17 +9,24 @@ export type Effect =
     | { type: "goto"; nodeId: string };
 
 export type GameStats = {
+    // base stats
     money: number;
     foodStock: number;
     population: number;
+    techLevel: number;
+    
+    // Derived Stats 
+    gdp: number;
+    cpi: number; 
+    unemploymentRate: number; 
     happiness: number;
     productivity: number; 
+    
     season: number;
     day: number;
     actionPoints: number;
 };
 
-// 带有视觉表现的节点定义
 export type DialogueNode = {
     id: string;
     type: "dialogue";
@@ -51,10 +58,16 @@ export const START_NODE_ID = "event1_start";
 
 export const INITIAL_STATS: GameStats = {
     money: 5000,
-    foodStock: 18,  
-    population: 20, 
+    foodStock: 18,
+    population: 20,
+    techLevel: 1.0, 
+    
+    gdp: 1000,     
+    cpi: 100,       
+    unemploymentRate: 0, 
     happiness: 70,
     productivity: 100,
+    
     season: 1,
     day: 1,
     actionPoints: 3,
