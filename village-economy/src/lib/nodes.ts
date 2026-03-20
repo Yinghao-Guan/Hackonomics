@@ -52,7 +52,14 @@ export type ChoiceNode = {
     }>;
 };
 
-export type Node = DialogueNode | ChoiceNode;
+export type IdleNode = {
+    id: string;
+    type: "idle";
+    bg?: "black" | "room" | "village";
+    next: string;
+};
+
+export type Node = DialogueNode | ChoiceNode | IdleNode;
 
 export const START_NODE_ID = "event1_start";
 
@@ -178,7 +185,14 @@ export const NODES: Record<string, Node> = {
     event1_ending_2: {
         id: "event1_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
         text: "请记住刚才的感觉。你做出选择的那一刻，你便永远地放弃了别的某种东西。在经济学里，这叫【机会成本 (Opportunity Cost)】。", 
-        next: "season_end",
+        next: "idle_season_1",
+    },
+
+    idle_season_1: {
+        id: "idle_season_1", 
+        type: "idle", 
+        bg: "village", 
+        next: "season_end" // 点击结束本季后，进入季末结算
     },
 
     season_end: {

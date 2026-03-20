@@ -170,8 +170,9 @@ export default function GamePage() {
     }
 
     const onContinue = () => {
-        const d = node as DialogueNode;
-        setState((s) => ({ ...s, currentNodeId: d.next }));
+        if ('next' in node) {
+            setState((s) => ({ ...s, currentNodeId: node.next as string }));
+        }
     };
 
     const onChoose = (choiceKey: "A" | "B" | "C") => {
@@ -216,13 +217,19 @@ export default function GamePage() {
             {/* Layer 0: 动态背景层 (100% 亮度展示) */}
             <div className={`absolute inset-0 z-0 transition-all duration-[1500ms] ease-in-out ${getBgStyle()}`} />
             
-            {/* 【修改点2】：渐变遮罩。只从屏幕底部往上黑，用来垫着对话框的文字，不影响上半部分的风景 */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent z-0 pointer-events-none" />
+            {/* 动态渐变遮罩！当处于 idle 状态时，透明度变为 0，让村庄风景 100% 无死角展现！ */}
+            <div className={`absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent z-0 pointer-events-none transition-opacity duration-1000 ${node.type === "idle" ? "opacity-0" : "opacity-100"}`} />
 
             {/* Layer 1: 角色立绘层 */}
-            <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pb-[20vh]">
-                <AvatarPlaceholder label={node.speaker} avatar={node.avatar} />
-            </div>
+            {node.type !== "idle" && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pb-[20vh]">
+                    {/* 使用 in 操作符，安全地告诉 TypeScript 只有存在该属性时才去读取 */}
+                    <AvatarPlaceholder 
+                        label={'speaker' in node ? node.speaker : ''} 
+                        avatar={'avatar' in node ? node.avatar : undefined} 
+                    />
+                </div>
+            )}
 
             {/* Layer 4: 顶部状态栏 */}
             <TopBar
@@ -246,24 +253,40 @@ export default function GamePage() {
                     <GenshinChoiceOverlay choices={(node as ChoiceNode).choices} onChoose={onChoose} />
                 )}
 
-                {/* 底部对话框 */}
-                <div className="pointer-events-auto w-full flex justify-center">
-                    <GenshinDialogueCard 
-                        speaker={node.speaker} 
-                        lines={normalizeLines(node.text)}
-                        isChoice={node.type === "choice"}
-                        prevNodeText={normalizeLines(prevNode?.text || "")[0]}
-                    >
-                        {node.type === "dialogue" && (
+                {/* 【修改点2】：只有在 dialogue 状态下，才显示底部黑色的对话框 */}
+                {node.type === "dialogue" && (
+                    <div className="pointer-events-auto w-full flex justify-center">
+                        <GenshinDialogueCard 
+                            speaker={(node as DialogueNode).speaker} 
+                            lines={normalizeLines((node as DialogueNode).text)}
+                            isChoice={false}
+                            prevNodeText={normalizeLines(prevNode?.text || "")[0]}
+                        >
                             <button
                                 onClick={onContinue}
                                 className="absolute bottom-4 right-6 text-2xl text-amber-500 hover:text-amber-400 animate-pulse cursor-pointer"
                             >
                                 ▼
                             </button>
-                        )}
-                    </GenshinDialogueCard>
-                </div>
+                        </GenshinDialogueCard>
+                    </div>
+                )}
+
+                {/* 【修改点3】：这是全新的 Idle 挂机状态 UI！一个性感的结束按钮 */}
+                {node.type === "idle" && (
+                    <div className="absolute bottom-12 right-12 z-30 pointer-events-auto animate-[popIn_0.6s_ease-out]">
+                        <button
+                            onClick={onContinue}
+                            className="group relative overflow-hidden rounded-2xl bg-amber-500 px-8 py-4 text-xl font-bold text-black shadow-[0_0_40px_rgba(245,158,11,0.4)] transition-all hover:scale-105 hover:bg-amber-400 active:scale-95"
+                        >
+                            <span className="relative z-10 flex items-center gap-2">
+                                结束本季 <span className="text-2xl">⏳</span>
+                            </span>
+                            {/* 扫光特效 */}
+                            <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-transparent via-white to-transparent opacity-30 group-hover:animate-[shimmer_1s_infinite]" />
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Layer 5: 弹窗与村民叠加层 */}
