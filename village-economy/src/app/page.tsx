@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import WanderingVillager from '@/components/Villager';
+import VillagerSwarm from '@/components/VillagerSwarm';
 
 // 定义剧本的数据结构
 type SceneNode = {
@@ -204,12 +204,14 @@ export default function Home() {
         )}
       </div>
 
-      {/* 最终画面出现刁民 */}
       {currentNode.type === "title" && (
         <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
-          <WanderingVillager />
-          <WanderingVillager />
-          <WanderingVillager />
+          {currentNode.type === "title" && (
+            <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
+              {/* 直接调动 20 个群演（包含老人、小孩和壮年），营造熙熙攘攘的开场 */}
+              <VillagerSwarm currentNodeId="title" population={20} />
+            </div>
+          )}
         </div>
       )}
 
