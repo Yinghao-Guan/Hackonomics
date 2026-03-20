@@ -1,36 +1,44 @@
+// src/app/components/Villager
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 
-const WanderingVillager = () => {
+export type VillagerRole = 'worker' | 'elder' | 'kid';
+export type VillagerStatus = 'normal' | 'starving' | 'dead';
+
+type Props = {
+  role?: VillagerRole;
+  status?: VillagerStatus;
+};
+
+const WanderingVillager = ({ role = 'worker', status = 'normal' }: Props) => {
   const [pos, setPos] = useState({ x: -100, y: -100 });
   const [transition, setTransition] = useState('none');
   const [facingRight, setFacingRight] = useState(true);
-  const [isVisible, setIsVisible] = useState(false); // 控制刷新时的闪烁
+  const [isVisible, setIsVisible] = useState(false);
 
-  // 使用 useRef 存储定时器，方便组件卸载时清理
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const startNewWalk = () => {
+      // 核心逻辑：如果死了或者饿倒了，就原地躺平，不要再乱走了！
+      if (status === 'dead' || status === 'starving') return;
+
       const w = window.innerWidth;
       const h = window.innerHeight;
-      const offset = 100; // 藏在屏幕外 100px 的距离
+      const offset = 100;
 
-      // 1. 随机挑选一个起始边缘 (0: 上, 1: 右, 2: 下, 3: 左)
       const startEdge = Math.floor(Math.random() * 4);
       let startX = 0, startY = 0;
-      
       if (startEdge === 0) { startX = Math.random() * w; startY = -offset; }
       else if (startEdge === 1) { startX = w + offset; startY = Math.random() * h; }
       else if (startEdge === 2) { startX = Math.random() * w; startY = h + offset; }
       else { startX = -offset; startY = Math.random() * h; }
 
-      // 2. 随机挑选一个结束边缘（必须和起始边缘不同）
       let endEdge = Math.floor(Math.random() * 3);
-      if (endEdge >= startEdge) endEdge++; // 巧妙的算法，确保起始和终点不在同一边
+      if (endEdge >= startEdge) endEdge++;
       
       let endX = 0, endY = 0;
       if (endEdge === 0) { endX = Math.random() * w; endY = -offset; }
@@ -38,40 +46,54 @@ const WanderingVillager = () => {
       else if (endEdge === 2) { endX = Math.random() * w; endY = h + offset; }
       else { endX = -offset; endY = Math.random() * h; }
 
-      // 3. 计算这段路程的距离和时间，确保每个人走路速度看起来差不多
       const distance = Math.hypot(endX - startX, endY - startY);
-      const speed = 60 + Math.random() * 70; // 每个人速度不一样，稍微错落一点
-      const duration = distance / speed; // 算出需要走多少秒
+      
+      // 根据角色调整速度：小孩跑得快，老人走得慢
+      let baseSpeed = 60;
+      if (role === 'kid') baseSpeed = 100;
+      if (role === 'elder') baseSpeed = 40;
+      const speed = baseSpeed + Math.random() * 30; 
+      
+      const duration = distance / speed;
 
-      // --- 核心魔术步骤 ---
-
-      // 步骤 A：关闭动画，瞬间把小人传送到起点
       setTransition('none'); 
       setPos({ x: startX, y: startY });
-      setFacingRight(endX > startX); // 脸朝向终点
+      setFacingRight(endX > startX);
       setIsVisible(true);
 
-      // 步骤 B：等待短短的 50 毫秒（让浏览器反应过来已经瞬移了），然后下达走向终点的指令
       timerRef.current = setTimeout(() => {
-        setTransition(`transform ${duration}s linear`); // 开启匀速动画
-        setPos({ x: endX, y: endY }); // 目标位置
+        // 如果在走的过程中突然饿了或死了，立刻停止！
+        if (status !== 'normal') return; 
 
-        // 步骤 C：等他走到终点后，休息 0.5 秒到 2 秒，然后重新开始下一轮
+        setTransition(`transform ${duration}s linear`);
+        setPos({ x: endX, y: endY });
+
         timerRef.current = setTimeout(() => {
-          setIsVisible(false); // 走出屏幕后先隐藏
+          setIsVisible(false);
           timerRef.current = setTimeout(startNewWalk, Math.random() * 1500 + 500);
-        }, duration * 1000); // 乘以 1000 把秒换成毫秒
-
+        }, duration * 1000);
       }, 50);
     };
 
-    // 初始时给个随机延迟，这样多个小人不会在同一秒钟同时从屏幕边缘冒出来
-    timerRef.current = setTimeout(startNewWalk, Math.random() * 3000);
+    // 状态改变时，如果恢复 normal，重新开始走；如果是死亡/挨饿，清空定时器
+    if (status === 'normal') {
+      timerRef.current = setTimeout(startNewWalk, Math.random() * 3000);
+    } else {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    }
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, []);
+  }, [status, role]); // 监听 status 变化
+
+  // 根据身份决定外观大小
+  const sizes = {
+    worker: { head: 16, bodyW: 20, bodyH: 24, color: '#151414' },
+    elder: { head: 14, bodyW: 18, bodyH: 20, color: '#323030' }, // 老人灰一点、矮一点
+    kid: { head: 12, bodyW: 14, bodyH: 16, color: '#111010' },   // 小孩小一点
+  };
+  const visual = sizes[role];
 
   return (
     <div
@@ -79,35 +101,33 @@ const WanderingVillager = () => {
         position: 'fixed',
         left: 0,
         top: 0,
-        opacity: isVisible ? 1 : 0, // 传送时隐藏，走动时显示
+        opacity: isVisible ? (status === 'dead' ? 0.3 : 1) : 0, // 死亡后变成半透明尸体
         transform: `translate(${pos.x}px, ${pos.y}px)`,
-        transition: transition, // 这里动态切换：瞬间移动(none) 还是 平滑走路(linear)
+        transition: transition,
         pointerEvents: 'none',
-        zIndex: 9999,
+        zIndex: status === 'dead' ? 1 : 9999, // 尸体垫底，活人在上面走
       }}
     >
-      {/* 负责左右转身的层 */}
-      <div style={{ transform: `scaleX(${facingRight ? 1 : -1})` }}>
-        
-        {/* 负责跳动的层 */}
+      <div style={{ 
+        transform: `scaleX(${facingRight ? 1 : -1}) ${status !== 'normal' ? 'rotate(90deg) translateY(10px)' : ''}`, // 挨饿和死亡时原地躺下 (旋转90度)
+        transition: 'transform 0.5s ease' // 倒下时的动画过渡
+      }}>
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            animation: 'villagerBounce 0.35s infinite alternate ease-in-out',
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            // 只有 normal 状态才有活蹦乱跳的动画
+            animation: status === 'normal' ? 'villagerBounce 0.35s infinite alternate ease-in-out' : 'none',
           }}
         >
-          <style>{`
-            @keyframes villagerBounce {
-              0% { transform: translateY(0); }
-              100% { transform: translateY(-8px); }
-            }
-          `}</style>
-          
-          {/* 制造新闻模拟器风格：方块圆头人 */}
-          <div style={{ width: '16px', height: '16px', backgroundColor: '#333', borderRadius: '50%' }} />
-          <div style={{ width: '20px', height: '24px', backgroundColor: '#333', borderRadius: '4px', marginTop: '2px' }} />
+          {/* 小人的死鱼眼特效 */}
+          <div style={{ 
+            width: `${visual.head}px`, height: `${visual.head}px`, 
+            backgroundColor: status === 'dead' ? '#ef4444' : visual.color, // 死后头变成红色
+            borderRadius: '50%', position: 'relative'
+          }}>
+             {status === 'dead' && <span style={{position:'absolute', top:'-2px', left:'2px', fontSize:'8px', color:'white', fontWeight:'bold'}}>×</span>}
+          </div>
+          <div style={{ width: `${visual.bodyW}px`, height: `${visual.bodyH}px`, backgroundColor: status === 'dead' ? '#999' : visual.color, borderRadius: '4px', marginTop: '2px' }} />
         </div>
       </div>
     </div>
