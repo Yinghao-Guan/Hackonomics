@@ -55,51 +55,51 @@ const SCRIPT: SceneNode[] = [
   // ---------------------------------------------------------
   // 索引 22 开始: 隐藏结局【平庸之赐】 (点击清除记忆后触发)
   // ---------------------------------------------------------
-  { type: "narration", text: "记忆被抽离的那一刻，你第一次感到轻松。不是胜利的轻松，而是——不再需要选择的轻松。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "记忆被抽离的那一刻，你第一次感到轻松。不是胜利的轻松，而是——不再需要选择的轻松。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "The moment your memories are taken away, you feel something unfamiliar. Not relief from victory — but relief from no longer having to choose.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "The moment your memories are taken away, you feel something unfamiliar. Not relief from victory — but relief from no longer having to choose.", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "你不再需要在饥饿与公平之间权衡，不再需要为看不见的未来负责。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "你不再需要在饥饿与公平之间权衡，不再需要为看不见的未来负责。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "No more weighing hunger against fairness. No more answering to a future you cannot see.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "No more weighing hunger against fairness. No more answering to a future you cannot see.", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "你成为了他们中的一员。一个不需要理解世界如何运作的人。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "你成为了他们中的一员。一个不需要理解世界如何运作的人。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "You become one of them — someone who no longer needs to understand how the world works.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "You become one of them — someone who no longer needs to understand how the world works.", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "日出而作，日落而息。你的世界，不再是一个系统，而是一片土地。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "日出而作，日落而息。你的世界，不再是一个系统，而是一片土地。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "You rise with the sun, and rest with it. The world is no longer a system — just a piece of land beneath your feet.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "You rise with the sun, and rest with it. The world is no longer a system — just a piece of land beneath your feet.", bg: "black", autoPlayDuration: 5500 },
 
   { type: "dialogue", speaker: "流浪商人", text: "现在的 CPI 太高了！边际效用已经失效了！你们这些人根本不懂什么叫宏观经济！", avatar: "🐪", bg: "black" },
 
 // { type: "dialogue", speaker: "Wandering Merchant", text: "Inflation is out of control! Marginal utility has collapsed! You people don’t even understand macroeconomics!", avatar: "🐪", bg: "black" },
 
-  { type: "narration", text: "你不懂。你也不想懂。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "你不懂。你也不想懂。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "You hear the words — but they no longer land on you.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "You hear the words — but they no longer land on you.", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "你看着自己长满老茧的手，只知道今年的麦子长势喜人，晚上能给孩子多熬一碗糊糊。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "你看着自己长满老茧的手，只知道今年的麦子长势喜人，晚上能给孩子多熬一碗糊糊。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "You look at the calluses on your hands. The soil is damp. The wheat is growing. That is enough.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "You look at the calluses on your hands. The soil is damp. The wheat is growing. That is enough.", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "你成家，生子，在柴米油盐的琐碎中，慢慢老去。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "你成家，生子，在柴米油盐的琐碎中，慢慢老去。", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "你不再试图解释世界。你只是活在其中。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "你不再试图解释世界。你只是活在其中。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "You no longer try to explain the world. You simply live in it.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "You no longer try to explain the world. You simply live in it.", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "也许，这就是另一种自由。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "也许，这就是另一种自由。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "Perhaps, this is another kind of freedom.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "Perhaps, this is another kind of freedom.", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "正如那句古老的话所说：多有智慧，就多有愁烦。", bg: "black", autoPlayDuration: 5000 },
+  { type: "narration", text: "正如那句古老的话所说：多有智慧，就多有愁烦。", bg: "black", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "As it is said: with much wisdom comes much sorrow.", bg: "black", autoPlayDuration: 5000 },
+// { type: "narration", text: "As it is said: with much wisdom comes much sorrow.", bg: "black", autoPlayDuration: 5500 },
 
-  { type: "narration", text: "而你，选择了一种不需要被证明的生活。", bg: "wheat", autoPlayDuration: 5000 },
+  { type: "narration", text: "而你，选择了一种不需要被证明的生活。", bg: "wheat", autoPlayDuration: 5500 },
 
-// { type: "narration", text: "And you chose a life that does not need to be justified.", bg: "wheat", autoPlayDuration: 5000 },
+// { type: "narration", text: "And you chose a life that does not need to be justified.", bg: "wheat", autoPlayDuration: 5500 },
 
 // 👇 演出高潮
   { type: "achievement", text: "平庸之赐 (The Gift of Being Unremarkable)", description: "你放弃了理解与控制世界的权力。在一个由选择构成的世界里，你选择了不再选择。", bg: "wheat" },
