@@ -122,13 +122,17 @@ export default function GamePage() {
             <div className={`absolute inset-0 z-0 transition-all duration-[1500ms] ease-in-out ${getBgStyle()}`} />
             <div className={`absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent z-0 pointer-events-none transition-opacity duration-1000 ${node.type === "idle" ? "opacity-0" : "opacity-100"}`} />
 
-            {node.type !== "idle" && (
+            {/* 隐藏头像：只有在非闲置、且非结局的情况下才显示 */}
+            {node.type !== "idle" && node.type !== "title_secret" && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pb-[20vh]">
-                    <AvatarPlaceholder label={'speaker' in node ? node.speaker : ''} avatar={'avatar' in node ? node.avatar : undefined} />
+                    <AvatarPlaceholder label={('speaker' in node && node.speaker) ? node.speaker : ''} avatar={'avatar' in node ? node.avatar : undefined} />
                 </div>
             )}
 
-            <TopBar stats={state.stats} logOpen={logOpen} onToggleLog={() => setLogOpen((v) => !v)} onNewGame={() => { clearStorage(); router.push("/"); }} onClear={() => { clearStorage(); router.push("/"); }} />
+            {/* 隐藏顶部状态栏：进入大结局后，一切数据皆为虚无 */}
+            {node.type !== "title_secret" && (
+                <TopBar stats={state.stats} logOpen={logOpen} onToggleLog={() => setLogOpen((v) => !v)} onNewGame={() => { clearStorage(); router.push("/"); }} onClear={() => { clearStorage(); router.push("/"); }} />
+            )}
 
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-end pointer-events-none">
                 {node.type === "choice" && <GenshinChoiceOverlay choices={(node as ChoiceNode).choices} onChoose={onChoose} />}
@@ -140,22 +144,23 @@ export default function GamePage() {
                     </div>
                 )}
 
+                {/* 沙盒面板... (此处保持原样) */}
                 {node.type === "idle" && (
                     <div className="absolute inset-0 z-30 pointer-events-none flex justify-between p-8 pt-24">
                         <div className="w-80 bg-black/80 backdrop-blur-md p-6 rounded-3xl border border-white/10 pointer-events-auto flex flex-col gap-4 overflow-y-auto max-h-[80vh] custom-scrollbar animate-[slideInLeft_0.4s_ease-out]">
                             <div className="mb-2">
                                 <h2 className="text-xl font-bold text-blue-400 mb-1">日常指令 (1 AP)</h2>
-                                <p className="text-zinc-400 text-xs">影响底层的宏观指标，牵一发而动全身。</p>
+                                <p className="text-zinc-400 text-xs leading-relaxed">提示：高生产力可提升每日税收。幸福度低于40会导致怠工减产，高于80会吸引流民加入。</p>
                             </div>
                             <button disabled={state.stats.actionPoints < 1} onClick={() => onAction("强制动员", [{ type: "add", key: "productivity", value: 20 }, { type: "add", key: "happiness", value: -10 }], 1)} className="w-full text-left p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
-                                <div className="font-bold text-white mb-1">⛏️ 强制动员</div><div className="text-xs text-zinc-400">+20生产力，-10幸福度。</div>
+                                <div className="font-bold text-white mb-1">⛏️ 强制动员</div><div className="text-xs text-zinc-400">+20生产力 (拉动次日税收)，但 -10幸福度。</div>
                             </button>
                             <button disabled={state.stats.actionPoints < 1} onClick={() => onAction("全村蹦迪", [{ type: "add", key: "happiness", value: 20 }, { type: "add", key: "productivity", value: -20 }], 1)} className="w-full text-left p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                                 <div className="font-bold text-white mb-1">🪩 全村蹦迪</div><div className="text-xs text-zinc-400">举办狂欢。+20幸福度，但全体宿醉导致 -20生产力。</div>
                             </button>
                             <button disabled={state.stats.actionPoints < 1 || !isMoneyPrinterUnlocked} onClick={() => onAction("印钞发钱", [{ type: "add", key: "money", value: 2000 }, { type: "add", key: "happiness", value: 5 }], 1)} className="w-full text-left p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all relative overflow-hidden">
                                 {!isMoneyPrinterUnlocked && <div className="absolute inset-0 bg-black/80 flex items-center justify-center text-xs text-red-400 font-bold backdrop-blur-sm z-10">完成事件五解锁</div>}
-                                <div className="font-bold text-white mb-1">🖨️ 印钞发钱</div><div className="text-xs text-zinc-400">印制¥2000，+5幸福。推高CPI。</div>
+                                <div className="font-bold text-white mb-1">🖨️ 印钞发钱</div><div className="text-xs text-zinc-400">凭空+¥2000，+5幸福。注意：资金远超生产力会引发CPI暴涨。</div>
                             </button>
                         </div>
 
@@ -164,19 +169,19 @@ export default function GamePage() {
                                 <h2 className="text-xl font-bold text-amber-500">基建工程</h2><span className="text-white font-bold text-lg">{state.stats.actionPoints}/3 AP</span>
                             </div>
                             <button disabled={state.stats.actionPoints < 3 || state.stats.money < 500} onClick={() => onAction("建造农场", [{ type: "add", key: "money", value: -500 }, { type: "add", key: "farmLevel", value: 1 }], 3)} className="w-full text-left p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 transition-all">
-                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>🌾 农场 ({state.stats.farmLevel}级)</span><span>¥500</span></div><div className="text-xs text-amber-200/70">每日产粮 +8。</div>
+                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>🌾 农场 ({state.stats.farmLevel}级)</span><span>¥500</span></div><div className="text-xs text-amber-200/70">每日产粮 +8。解决温饱的基础。</div>
                             </button>
                             <button disabled={state.stats.actionPoints < 3 || state.stats.money < 800} onClick={() => onAction("建造牧场", [{ type: "add", key: "money", value: -800 }, { type: "add", key: "pastureLevel", value: 1 }], 3)} className="w-full text-left p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 transition-all">
-                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>🐄 牧场 ({state.stats.pastureLevel}级)</span><span>¥800</span></div><div className="text-xs text-amber-200/70">每日产粮 +4。</div>
+                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>🐄 牧场 ({state.stats.pastureLevel}级)</span><span>¥800</span></div><div className="text-xs text-amber-200/70">每日产粮 +4。可能触发特定经济事件。</div>
                             </button>
                             <button disabled={state.stats.actionPoints < 3 || state.stats.money < 1200} onClick={() => onAction("建造研究院", [{ type: "add", key: "money", value: -1200 }, { type: "add", key: "academyLevel", value: 1 }, { type: "add", key: "techLevel", value: 0.2 }], 3)} className="w-full text-left p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 transition-all">
-                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>📜 研究院 ({state.stats.academyLevel}级)</span><span>¥1200</span></div><div className="text-xs text-amber-200/70">科技倍率 +0.2。放大产能。</div>
+                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>📜 研究院 ({state.stats.academyLevel}级)</span><span>¥1200</span></div><div className="text-xs text-amber-200/70">科技倍率 +0.2。指数级放大矿场收益与GDP。</div>
                             </button>
                             <button disabled={state.stats.actionPoints < 3 || state.stats.money < 1500} onClick={() => onAction("建造市场", [{ type: "add", key: "money", value: -1500 }, { type: "add", key: "marketLevel", value: 1 }], 3)} className="w-full text-left p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 transition-all">
-                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>🛒 市场 ({state.stats.marketLevel}级)</span><span>¥1500</span></div><div className="text-xs text-amber-200/70">每日商业税收大幅提升。</div>
+                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>🛒 市场 ({state.stats.marketLevel}级)</span><span>¥1500</span></div><div className="text-xs text-amber-200/70">每日额外入账 +¥150，大幅拉动消费。</div>
                             </button>
                             <button disabled={state.stats.actionPoints < 3 || state.stats.money < 2000} onClick={() => onAction("开凿矿场", [{ type: "add", key: "money", value: -2000 }, { type: "add", key: "mineLevel", value: 1 }], 3)} className="w-full text-left p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 transition-all">
-                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>⚒️ 矿场 ({state.stats.mineLevel}级)</span><span>¥2000</span></div><div className="text-xs text-amber-200/70">工业基础。巨额资金。</div>
+                                <div className="font-bold text-amber-400 mb-1 flex justify-between"><span>⚒️ 矿场 ({state.stats.mineLevel}级)</span><span>¥2000</span></div><div className="text-xs text-amber-200/70">每日巨额税收。受科技水平乘数加成。</div>
                             </button>
 
                             <div className="mt-4 pt-4 border-t border-white/10 relative">
@@ -197,9 +202,30 @@ export default function GamePage() {
                         </div>
                     </div>
                 )}
+
+                {/* 👇 核心新增：游戏内的所有电影级大结局！ */}
+                {node.type === "title_secret" && (
+                    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center w-full bg-black/90 backdrop-blur-sm animate-[fadeIn_3s_ease-in] pointer-events-auto">
+                        <h1 className="text-4xl md:text-6xl font-serif tracking-widest text-white mb-6 drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] text-center px-4">
+                            {('speaker' in node && node.speaker) ? node.speaker : "【游戏结束】"}
+                        </h1>
+                        <p className="text-xl text-zinc-300 italic mb-16 tracking-widest drop-shadow-md text-center px-4 max-w-2xl leading-relaxed">
+                            {('text' in node && node.text) ? node.text : ""}
+                        </p>
+                        <button
+                            onClick={() => {
+                                clearStorage();
+                                router.push("/");
+                            }}
+                            className="group relative overflow-hidden rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-10 py-4 text-lg font-medium text-white transition-all hover:bg-white/20 hover:scale-105 cursor-pointer"
+                        >
+                            <span className="relative z-10">重新轮回 (Restart)</span>
+                        </button>
+                    </div>
+                )}
             </div>
 
-            {/* 🔴 OVERLAY 1: 每日结算账单 */}
+            {/* OVERLAYS (结算与警报保持不变) */}
             {dailySummary && !crisisAlert && (
                 <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
                     <div className="bg-zinc-900 border border-white/20 p-8 rounded-3xl w-80 shadow-2xl animate-[slideUp_0.4s_ease-out]">
@@ -209,31 +235,21 @@ export default function GamePage() {
                             <div className="flex justify-between text-amber-400"><span>🌾 基础采摘与产出:</span> <span>+{dailySummary.foodProd} kg</span></div>
                             <div className="flex justify-between text-red-400"><span>口 消耗储备:</span> <span>-{dailySummary.foodCons} kg</span></div>
                             {dailySummary.starved > 0 && (
-                                <div className="text-center bg-red-500/20 text-red-400 p-2 rounded-lg font-bold animate-pulse mt-4">
-                                    💀 饿死 {dailySummary.starved} 人
-                                </div>
+                                <div className="text-center bg-red-500/20 text-red-400 p-2 rounded-lg font-bold animate-pulse mt-4">💀 饿死 {dailySummary.starved} 人</div>
                             )}
                             {dailySummary.messages.map((m, i) => (
                                 <div key={i} className="text-sm text-amber-500 mt-2 text-center leading-relaxed">{m}</div>
                             ))}
                         </div>
-                        <button 
-                            onClick={() => setDailySummary(null)}
-                            className="mt-8 w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-gray-200 transition-all"
-                        >
-                            确认
-                        </button>
+                        <button onClick={() => setDailySummary(null)} className="mt-8 w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-gray-200 transition-all">确认</button>
                     </div>
                 </div>
             )}
 
-            {/* 🔴 OVERLAY 2: 突发危机警报与冲击波 (SHOCK) */}
             {crisisAlert && (
                 <div className="absolute inset-0 z-[70] flex flex-col items-center justify-center bg-red-950/95 backdrop-blur-md animate-[flashRed_1.5s_infinite]">
                     <div className="text-[100px] animate-[bounce_1s_infinite]">🚨</div>
-                    <h1 className="text-4xl font-black tracking-widest text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.8)] mt-2 mb-2">
-                        突 发 危 机
-                    </h1>
+                    <h1 className="text-4xl font-black tracking-widest text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.8)] mt-2 mb-2">突 发 危 机</h1>
                     <h2 className="text-3xl text-white font-bold mb-4">{crisisAlert.title}</h2>
                     <p className="max-w-xl text-center text-red-200 mb-8 leading-relaxed text-lg">{crisisAlert.description}</p>
                     
@@ -241,9 +257,7 @@ export default function GamePage() {
                         <div className="bg-black/50 border border-red-500/50 rounded-xl p-6 mb-8 w-96 shadow-2xl">
                             <div className="text-sm text-red-400 font-bold mb-4 border-b border-red-500/30 pb-2">⚠️ 局势剧变，系统受到冲击：</div>
                             {crisisAlert.shockEffects.map((e, i) => {
-                                // 👇 核心修复：类型守卫！告诉 TS 过滤掉成就、日志等没有 value 的 effect
                                 if (e.type !== "add" && e.type !== "set") return null;
-                                
                                 return (
                                     <div key={i} className="text-white text-xl flex justify-between font-mono my-2">
                                         <span>{e.key.toUpperCase()}</span>
@@ -255,36 +269,25 @@ export default function GamePage() {
                             })}
                         </div>
                     )}
-
                     <button 
                         onClick={() => {
-                            // 1. 将冲击波真实地应用到状态树中
                             let next = applyEffects(state, crisisAlert.shockEffects).state;
-                            // 2. 跳转到对应危机事件
                             next.currentNodeId = crisisAlert.eventId;
                             if (!next.completedEvents) next.completedEvents = [];
                             next.completedEvents.push(crisisAlert.eventId);
-                            // 3. 更新游戏并清理面板
-                            setState(next);
-                            setDailySummary(null);
-                            setCrisisAlert(null);
+                            setState(next); setDailySummary(null); setCrisisAlert(null);
                         }}
                         className="bg-red-600 hover:bg-red-500 text-white font-bold text-2xl px-12 py-4 rounded-full shadow-[0_0_40px_rgba(239,68,68,0.5)] transition-all hover:scale-110 active:scale-95"
-                    >
-                        前往处理
-                    </button>
+                    >前往处理</button>
                 </div>
             )}
 
             <LogDrawer open={logOpen} log={state.log} />
             <AchievementToast achievement={latestAchievement} onClose={() => setToastAchId(null)} />
-            {node.bg === "village" && <div className="absolute inset-0 z-0 pointer-events-none"><VillagerSwarm currentNodeId={state.currentNodeId} population={state.stats.population} /></div>}
+            {node.bg === "village" && node.type !== "title_secret" && <div className="absolute inset-0 z-0 pointer-events-none"><VillagerSwarm currentNodeId={state.currentNodeId} population={state.stats.population} /></div>}
 
             <style dangerouslySetInnerHTML={{__html: `
-                @keyframes flashRed {
-                    0%, 100% { background-color: rgba(69, 10, 10, 0.95); }
-                    50% { background-color: rgba(127, 29, 29, 0.95); }
-                }
+                @keyframes flashRed { 0%, 100% { background-color: rgba(69, 10, 10, 0.95); } 50% { background-color: rgba(127, 29, 29, 0.95); } }
             `}} />
         </main>
     );

@@ -64,7 +64,15 @@ export type IdleNode = {
     next: string;
 };
 
-export type Node = DialogueNode | ChoiceNode | IdleNode;
+export type TitleSecretNode = {
+    id: string;
+    type: "title_secret";
+    speaker?: string;
+    text?: string;
+    bg?: "black" | "room" | "village" | "wheat";
+};
+
+export type Node = DialogueNode | ChoiceNode | IdleNode | TitleSecretNode;
 
 export const START_NODE_ID = "event1_start";
 
@@ -781,9 +789,37 @@ export const NODES: Record<string, Node> = {
         text: "也许，你只是一个在不同情境下做出不同选择的普通人。而这，才是经济学真正想研究的对象。",
         next: "epilogue_final",
     },
-    epilogue_final: {
-        id: "epilogue_final", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
-        text: "你醒来并非为了统治，而是为了抉择。\n\n——感谢游玩《Village Economy》",
-        next: "epilogue_final",
+    epilogue_final: { 
+        id: "epilogue_final", type: "title_secret", bg: "black", 
+        speaker: "【真结局：时代的守望者】", 
+        text: "你醒来并非为了统治，而是为了抉择。 —— 感谢游玩《Village Economy》" 
+    },
+
+    // 💀 坏结局 1：饿死殆尽 (人口 = 0)
+    bad_ending_starved: { 
+        id: "bad_ending_starved", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black", 
+        text: "最后一声微弱的喘息也停止了。村子里再也没有活人。", next: "bad_ending_starved_2" 
+    },
+    bad_ending_starved_2: { 
+        id: "bad_ending_starved_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black", 
+        text: "即使是神，也无法统治一片没有人的土地。你的宏观调控，最终以种族灭绝告终。", next: "bad_ending_starved_title" 
+    },
+    bad_ending_starved_title: { 
+        id: "bad_ending_starved_title", type: "title_secret", bg: "black", 
+        speaker: "【坏结局：死寂之村】", text: "A Ghost Town." 
+    },
+
+    // 💀 坏结局 2：幸福度归零被推翻 (幸福度 = 0)
+    bad_ending_exiled: { 
+        id: "bad_ending_exiled", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black", 
+        text: "听到了吗？门外那些愤怒的火把和草叉。", next: "bad_ending_exiled_2" 
+    },
+    bad_ending_exiled_2: { 
+        id: "bad_ending_exiled_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black", 
+        text: "你把他们逼到了绝境。他们没收了你的财产，剥夺了你的权力，将你永远流放进了暴风雪中。这就是无视民意的下场。", next: "bad_ending_exiled_title" 
+    },
+    bad_ending_exiled_title: { 
+        id: "bad_ending_exiled_title", type: "title_secret", bg: "black", 
+        speaker: "【坏结局：独裁者的末日】", text: "The Fall of a Tyrant." 
     },
 };
