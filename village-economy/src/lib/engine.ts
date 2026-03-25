@@ -5,51 +5,52 @@ import { clampStats } from "./gameState";
 
 export type DailySummary = {
     day: number; foodProd: number; foodCons: number; starved: number; income: number; messages: string[];
+    // 把当天的宏观指标也打包送出去
+    macro: { population: number; happiness: number; productivity: number; cpi: number; unemploymentRate: number; gdp: number; };
 };
 
 export type CrisisAlert = {
     eventId: string; title: string; description: string; shockEffects: Effect[];
 };
 
-// ==========================================
-// 核心：每日结算引擎 (Daily Tick Engine)
-// ==========================================
 export function processDailyTick(state: GameState): { state: GameState, summary: DailySummary, crisis: CrisisAlert | null } {
     let next = structuredClone(state);
     let s = next.stats;
-    let summary: DailySummary = { day: s.day, foodProd: 0, foodCons: 0, starved: 0, income: 0, messages: [] };
+    let summary: DailySummary = { day: s.day, foodProd: 0, foodCons: 0, starved: 0, income: 0, messages: [], macro: { population: 0, happiness: 0, productivity: 0, cpi: 0, unemploymentRate: 0, gdp: 0 } };
 
     // --- 1. 农业与生存结算 ---
-    // 基础采集能力随人口下降而下降，如果村子只剩几个人，甚至连野果都摘不够
     const baseForaging = Math.floor(s.population * 0.4); 
-    summary.foodProd = baseForaging + (s.farmLevel * 8) + (s.pastureLevel * 4); 
+    // 正常生产力是 100，倍率为 1.0。如果蹦迪导致生产力掉到 80，农场产出直接打 8 折！
+    const prodMultiplier = Math.max(0.1, s.productivity / 100); 
+    const farmingOutput = Math.floor(((s.farmLevel * 8) + (s.pastureLevel * 4)) * prodMultiplier);
+    summary.foodProd = baseForaging + farmingOutput
     summary.foodCons = s.population; 
     
     s.foodStock += summary.foodProd;
     s.foodStock -= summary.foodCons;
 
     if (s.foodStock < 0) {
-        // 饥荒惩罚大幅增强：粮食不足时，人们开始抢夺，甚至互相残杀
-        summary.starved = Math.floor(Math.abs(s.foodStock) / 2); // 饿死速度加快
+        // 👇 平衡性修复：大幅提高死亡速度（缺口除以1.5），让人口迅速归零
+        summary.starved = Math.ceil(Math.abs(s.foodStock) / 1.5); 
         if (summary.starved > 0) {
             s.population -= summary.starved;
-            s.happiness -= summary.starved * 15; // 饿死人带来的幸福度惩罚极速上升
-            s.productivity -= summary.starved * 10; 
+            // 👇 平衡性修复：饿死人不再按人头扣幸福度（避免瞬间暴动），而是固定恐慌值
+            s.happiness -= 10; 
+            s.productivity -= summary.starved * 5; 
             summary.messages.push(`⚠️ 饥荒蔓延：储备耗尽，惨死 ${summary.starved} 人！`);
         } else {
             summary.messages.push(`⚠️ 粮食短缺：全村陷入饥饿，虚弱导致生产力骤降。`);
             s.productivity -= 5;
+            s.happiness -= 5; 
         }
         s.foodStock = 0;
     }
 
     // --- 2. 经济与税收结算 ---
-    // 税收直接挂钩生产力，如果蹦迪导致生产力暴跌，税收会直接跳水
     let baseIncome = (s.population * 5) + (s.marketLevel * 150) + (s.productivity * 3) + (s.mineLevel * 300 * s.techLevel);
     
     if (s.happiness <= 30) {
-        // 幸福度极低时的暴乱级惩罚
-        baseIncome = Math.floor(baseIncome * 0.2); // 税收仅剩 20%
+        baseIncome = Math.floor(baseIncome * 0.2); 
         s.productivity = Math.max(0, s.productivity - 15); 
         summary.messages.push(`😡 暴乱边缘：村民罢工抗议，税收枯竭，设施遭到破坏！`);
     } else if (s.happiness < 50) {
@@ -63,14 +64,13 @@ export function processDailyTick(state: GameState): { state: GameState, summary:
     summary.income = Math.floor(baseIncome);
     s.money += summary.income;
 
-    // --- 3. 宏观指标的深度连动 (Interconnectivity) ---
-    // 连动A：大都会效应 (极难达成，但一旦达成人口会爆)
+    // --- 3. 宏观指标的深度连动 ---
     if (s.gdp > 3000 && s.happiness >= 70 && s.foodStock > s.population * 3) {
         const immigrants = Math.max(1, Math.floor(s.gdp / 2500));
         s.population += immigrants;
         summary.messages.push(`🌟 繁荣之城：丰衣足食吸引了 ${immigrants} 名流民定居！`);
     }
-    // 连动B：通胀带来的灾难 (印钞票的报应)
+    
     if (s.cpi > 150) {
         s.happiness -= 15;
         s.productivity -= 10;
@@ -79,10 +79,16 @@ export function processDailyTick(state: GameState): { state: GameState, summary:
         s.happiness -= 5;
         summary.messages.push(`🛒 物价飞涨：生活成本攀升，引发不满。`);
     }
-    // 连动C：失业潮的绝望
+    
     if (s.unemploymentRate > 30) {
         s.happiness -= 10;
         summary.messages.push(`📉 绝望蔓延：遍地无业游民，社会治安恶化！`);
+    }
+
+    // 👇 新增：仓廪实而知礼节 (自动恢复幸福度)
+    if (s.foodStock > s.population * 2 && s.unemploymentRate <= 15 && s.cpi <= 120 && s.happiness < 90) {
+        s.happiness += 2;
+        summary.messages.push(`🍞 仓廪实而知礼节：生活安定，幸福度自然回升。`);
     }
 
     s.actionPoints = 3;
@@ -96,30 +102,19 @@ export function processDailyTick(state: GameState): { state: GameState, summary:
     if (summary.messages.length > 0) logText += ` | ${summary.messages.join(" ")}`;
     next.log.unshift({ ts: Date.now(), text: logText });
 
-    // --- 4. 终极沙盒巡逻犬 (Event Dispatcher with Shock) ---
     let crisis: CrisisAlert | null = null;
     const h = next.completedEvents || [];
     const isDone = (id: string) => h.includes(id);
 
-    // 💀 绝对最高优先级：Game Over 死亡判定 (不进则退的死局)
     if (next.stats.population <= 0) {
-        crisis = {
-            eventId: "bad_ending_starved", title: "全村覆没", description: "最后一名村民也倒下了。这片土地重新归于死寂。", shockEffects: []
-        };
+        crisis = { eventId: "bad_ending_starved", title: "全村覆没", description: "最后一名村民也倒下了。这片土地重新归于死寂。", shockEffects: [] };
     } else if (next.stats.happiness <= 0) {
-        crisis = {
-            eventId: "bad_ending_exiled", title: "暴民起义", description: "彻底绝望的村民冲破了村长办公室！他们剥夺了你的权力，准备将你永远流放！", shockEffects: []
-        };
+        crisis = { eventId: "bad_ending_exiled", title: "暴民起义", description: "彻底绝望的村民冲破了村长办公室！他们剥夺了你的权力，准备将你永远流放！", shockEffects: [] };
     } 
-    // ⚠️ 次高优先级：红线暴动惩罚
     else if (next.stats.happiness <= 20 && !isDone("event_riot")) {
-         crisis = {
-            eventId: "idle_main", title: "全村暴动", description: "村民的怒火彻底点燃！他们砸毁了建筑，抢走了金库里的钱！",
-            shockEffects: [{ type: "add", key: "money", value: -1000 }, { type: "set", key: "marketLevel", value: 0 }, { type: "add", key: "population", value: -3 }]
-        };
+         crisis = { eventId: "idle_main", title: "全村暴动", description: "村民的怒火彻底点燃！他们砸毁了建筑，抢走了金库里的钱！", shockEffects: [{ type: "add", key: "money", value: -1000 }, { type: "set", key: "marketLevel", value: 0 }, { type: "add", key: "population", value: -3 }] };
         next.completedEvents.push("event_riot");
     }
-    // 正常的剧本逻辑流
     else {
         if (next.stats.pastureLevel > 0 && !isDone("event2_start")) {
             crisis = { eventId: "event2_start", title: "肉食的诱惑", description: "村民对小麦感到厌烦，有人开始觊觎牧场里的牛羊，私自将大量战略储备粮喂给牲畜！", shockEffects: [{ type: "add", key: "foodStock", value: -15 }] };
@@ -142,39 +137,38 @@ export function processDailyTick(state: GameState): { state: GameState, summary:
         }
     }
 
+    summary.macro = {
+        population: next.stats.population,
+        happiness: next.stats.happiness,
+        productivity: next.stats.productivity,
+        cpi: next.stats.cpi,
+        unemploymentRate: next.stats.unemploymentRate,
+        gdp: next.stats.gdp
+    };
+
     return { state: next, summary, crisis };
 }
 
-// ==========================================
-// 宏观经济动态联立方程组 (每次点按钮都会实时重算)
-// ==========================================
 function recalculateMacroEconomics(stats: GameStats): GameStats {
     let next = { ...stats };
-    
-    // 失业率对生产力极其敏感
     const laborForce = Math.floor(next.population * 0.6);
     const jobsAvailable = Math.floor(next.productivity / 10) + (next.mineLevel * 8) + (next.farmLevel * 3) + (next.marketLevel * 4);
     const unemployed = Math.max(0, laborForce - jobsAvailable);
     next.unemploymentRate = laborForce > 0 ? Math.round((unemployed / laborForce) * 100) : 0;
 
-    // GDP 直接受生产力(C+I)影响
     const consumption = (next.population * 20) + (next.marketLevel * 300) + (next.productivity * 2); 
     const investment = (next.techLevel * 500) + (next.academyLevel * 800) + (next.mineLevel * 1200);  
     const govtSpending = next.money * 0.1;    
     next.gdp = Math.round(consumption + investment + govtSpending);
 
-    // CPI：钱越多、生产力越低，物价飞得越快！
     const moneySupplyRatio = Math.max(1, next.money) / 5000; 
-    const productionRatio = Math.max(0.01, next.productivity / 100); // 生产力如果是0，物价直接上天
+    const productionRatio = Math.max(0.01, next.productivity / 100); 
     const inflationFactor = moneySupplyRatio / productionRatio;
     next.cpi = Math.round(100 * inflationFactor);
 
     return next;
 }
 
-// ==========================================
-// 选项执行器 (核心：每次执行动作，立刻重算宏观经济)
-// ==========================================
 export function applyEffects(state: GameState, effects: Effect[]): { state: GameState; lastAchievementId?: string } {
     let next: GameState = structuredClone(state);
     let lastAchievementId: string | undefined;
@@ -197,10 +191,8 @@ export function applyEffects(state: GameState, effects: Effect[]): { state: Game
         }
     }
     
-    // 每次你点“全村蹦迪”，底下的数据立刻、马上给你重算！
     next.stats = clampStats(next.stats);
     next.stats = recalculateMacroEconomics(next.stats);
     next.stats = clampStats(next.stats);
-    
     return { state: next, lastAchievementId };
 }

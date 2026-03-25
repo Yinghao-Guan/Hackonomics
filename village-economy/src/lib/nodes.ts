@@ -1,3 +1,5 @@
+import { Achievement } from "./gameState";
+
 // src/lib/nodes.ts
 export type ChoiceKey = "A" | "B" | "C";
 
@@ -33,6 +35,9 @@ export type GameStats = {
     marketLevel: number;
 };
 
+// 统一的背景类型定义
+export type BgType = "black" | "room" | "village" | "wheat" | "ruins" | "fire" | "dawn";
+
 export type DialogueNode = {
     id: string;
     type: "dialogue";
@@ -40,7 +45,7 @@ export type DialogueNode = {
     text: string | string[];
     next: string;
     avatar?: string; 
-    bg?: "black" | "room" | "village"; 
+    bg?: BgType; 
 };
 
 export type ChoiceNode = {
@@ -49,7 +54,7 @@ export type ChoiceNode = {
     speaker: string;
     text: string | string[];
     avatar?: string;
-    bg?: "black" | "room" | "village";
+    bg?: BgType;
     choices: Array<{
         key: ChoiceKey;
         title: string;
@@ -60,7 +65,7 @@ export type ChoiceNode = {
 export type IdleNode = {
     id: string;
     type: "idle";
-    bg?: "black" | "room" | "village";
+    bg?: BgType;
     next: string;
 };
 
@@ -69,10 +74,21 @@ export type TitleSecretNode = {
     type: "title_secret";
     speaker?: string;
     text?: string;
-    bg?: "black" | "room" | "village" | "wheat";
+    bg?: BgType;
 };
 
-export type Node = DialogueNode | ChoiceNode | IdleNode | TitleSecretNode;
+export type AchievementNode = { id: string; type: "achievement"; text: string; description?: string; bg?: BgType; next: string; };
+
+export type NarrationNode = { 
+    id: string; 
+    type: "narration"; 
+    text: string; 
+    bg?: BgType; 
+    autoPlayDuration?: number; // 如果有这个值，就会自动倒计时跳转；没有则等待玩家点击
+    next: string; 
+};
+
+export type Node = DialogueNode | ChoiceNode | IdleNode | TitleSecretNode | AchievementNode | NarrationNode;
 
 export const START_NODE_ID = "event1_start";
 
@@ -760,66 +776,57 @@ export const NODES: Record<string, Node> = {
         next: "epilogue_2",
     },
     epilogue_2: {
-        id: "epilogue_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "epilogue_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
         text: "你知道吗，我观察过很多村长。有人看见饥荒，第一反应是平均分配；有人看见失业，第一反应是开动印钞机；有人看见垄断，第一反应是让市场自己解决。",
         next: "epilogue_3",
     },
     epilogue_3: {
-        id: "epilogue_3", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "epilogue_3", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
         text: "没有一种本能是错的。凯恩斯、哈耶克、马克思——他们都看见了真实的问题，只是开出了不同的药方。而每一剂药，都有它的副作用。",
         next: "epilogue_4",
     },
     epilogue_4: {
-        id: "epilogue_4", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "epilogue_4", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
         text: "稀缺性、机会成本、边际效用、外部性、创造性破坏、通胀、垄断、节俭悖论、比较优势、汇率战——你经历的每一件事，都在现实世界中每天上演，规模只是大了几亿倍而已。",
         next: "epilogue_5",
     },
     epilogue_5: {
-        id: "epilogue_5", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "epilogue_5", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
         text: "所以，我记下了你的每一个决定。不是为了评判你，而是为了告诉你——你心里，住着一位经济学家。",
         next: "epilogue_6",
     },
     epilogue_6: {
-        id: "epilogue_6", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "epilogue_6", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
         text: "也许你是那种相信政府干预能熨平一切波动的宏观架构师。也许你是那种对任何管制都深感厌恶的自由市场信徒。也许你是那种始终把公平置于效率之上的平等守望者。",
         next: "epilogue_7",
     },
     epilogue_7: {
-        id: "epilogue_7", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "epilogue_7", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
         text: "也许，你只是一个在不同情境下做出不同选择的普通人。而这，才是经济学真正想研究的对象。",
-        next: "epilogue_final",
+        next: "epilogue_ach",
     },
+    epilogue_ach: { id: "epilogue_ach", type: "achievement", text: "时代的守望者 (The Watcher of Era)", description: "你经历了饥荒、通胀、垄断与暴动。你没有逃避，也没有被吞噬。你用权衡与妥协，硬生生地趟出了一条文明的活路。", bg: "dawn", next: "epilogue_final" },
     epilogue_final: { 
         id: "epilogue_final", type: "title_secret", bg: "black", 
         speaker: "【真结局：时代的守望者】", 
         text: "你醒来并非为了统治，而是为了抉择。 —— 感谢游玩《Village Economy》" 
     },
 
-    // 💀 坏结局 1：饿死殆尽 (人口 = 0)
-    bad_ending_starved: { 
-        id: "bad_ending_starved", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black", 
-        text: "最后一声微弱的喘息也停止了。村子里再也没有活人。", next: "bad_ending_starved_2" 
-    },
-    bad_ending_starved_2: { 
-        id: "bad_ending_starved_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black", 
-        text: "即使是神，也无法统治一片没有人的土地。你的宏观调控，最终以种族灭绝告终。", next: "bad_ending_starved_title" 
-    },
-    bad_ending_starved_title: { 
-        id: "bad_ending_starved_title", type: "title_secret", bg: "black", 
-        speaker: "【坏结局：死寂之村】", text: "A Ghost Town." 
-    },
+    // ─── 💀 坏结局 1：饿死殆尽 ───────────────────
+    bad_ending_starved: { id: "bad_ending_starved", type: "narration", bg: "black", autoPlayDuration: 4000, text: "最后一声微弱的喘息也停止了。", next: "bad_ending_starved_2" },
+    bad_ending_starved_2: { id: "bad_ending_starved_2", type: "narration", bg: "black", autoPlayDuration: 4000, text: "村子里再也没有活人。", next: "bad_ending_starved_3" },
+    // 👇 背景废墟亮起，暂停等待点击
+    bad_ending_starved_3: { id: "bad_ending_starved_3", type: "narration", bg: "ruins", autoPlayDuration: 4000, text: "即使是神，也无法统治一片没有人的土地。你的宏观调控，最终以绝对的死寂告终。", next: "bad_ending_starved_ach" },
+    // 👇 成就浮现
+    bad_ending_starved_ach: { id: "bad_ending_starved_ach", type: "achievement", bg: "ruins", text: "死寂之村 (A Ghost Town)", description: "你没有被推翻，也没有被击败。你只是在冰冷的算计中，失去了所有需要你计算的人。", next: "bad_ending_starved_title" },
+    // 👇 背景化为纯黑
+    bad_ending_starved_title: { id: "bad_ending_starved_title", type: "title_secret", bg: "black", speaker: "【坏结局：死寂之村】", text: "A Ghost Town." },
 
-    // 💀 坏结局 2：幸福度归零被推翻 (幸福度 = 0)
-    bad_ending_exiled: { 
-        id: "bad_ending_exiled", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black", 
-        text: "听到了吗？门外那些愤怒的火把和草叉。", next: "bad_ending_exiled_2" 
-    },
-    bad_ending_exiled_2: { 
-        id: "bad_ending_exiled_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black", 
-        text: "你把他们逼到了绝境。他们没收了你的财产，剥夺了你的权力，将你永远流放进了暴风雪中。这就是无视民意的下场。", next: "bad_ending_exiled_title" 
-    },
-    bad_ending_exiled_title: { 
-        id: "bad_ending_exiled_title", type: "title_secret", bg: "black", 
-        speaker: "【坏结局：独裁者的末日】", text: "The Fall of a Tyrant." 
-    },
+    // ─── 💀 坏结局 2：幸福度归零被推翻 ──────────────
+    bad_ending_exiled: { id: "bad_ending_exiled", type: "narration", bg: "black", autoPlayDuration: 4000, text: "听到了吗？门外那些愤怒的火把和草叉。", next: "bad_ending_exiled_2" },
+    bad_ending_exiled_2: { id: "bad_ending_exiled_2", type: "narration", bg: "black", autoPlayDuration: 4000, text: "你把他们逼到了绝境。", next: "bad_ending_exiled_3" },
+    // 👇 背景烈火亮起，暂停等待点击
+    bad_ending_exiled_3: { id: "bad_ending_exiled_3", type: "narration", bg: "fire", autoPlayDuration: 4000, text: "他们没收了你的财产，剥夺了你的权力，将你永远流放进了暴风雪中。", next: "bad_ending_exiled_ach" },
+    bad_ending_exiled_ach: { id: "bad_ending_exiled_ach", type: "achievement", bg: "fire", text: "独裁者的末日 (The Fall of a Tyrant)", description: "你把效率凌驾于人性之上，最终被忍无可忍的人性反噬。执政者最大的错觉，是以为数字可以替代人心。", next: "bad_ending_exiled_title" },
+    bad_ending_exiled_title: { id: "bad_ending_exiled_title", type: "title_secret", bg: "black", speaker: "【坏结局：独裁者的末日】", text: "The Fall of a Tyrant." },
 };
