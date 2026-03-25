@@ -7,7 +7,7 @@ import TopBar from "@/components/TopBar";
 import LogDrawer from "@/components/LogDrawer";
 import AchievementToast from "@/components/AchievementToast";
 import AvatarPlaceholder from "@/components/AvatarPlaceholder";
-import { NODES, START_NODE_ID, type ChoiceNode, type DialogueNode, type Effect } from "@/lib/nodes";
+import { NODES, START_NODE_ID, type ChoiceNode, type DialogueNode, type Effect, type NarrationNode, type AchievementNode } from "@/lib/nodes";
 import { loadFromStorage, saveToStorage, clearStorage } from "@/lib/storage";
 import { newGameState, clampStats, type GameState } from "@/lib/gameState";
 import { applyEffects, type DailySummary, type CrisisAlert } from "@/lib/engine";
@@ -69,6 +69,15 @@ export default function GamePage() {
     useEffect(() => { saveToStorage(state); }, [state]);
 
     const node = NODES[state.currentNodeId];
+
+    useEffect(() => {
+        if (node && 'autoPlayDuration' in node && node.autoPlayDuration) {
+            const timer = setTimeout(() => {
+                onContinue();
+            }, node.autoPlayDuration);
+            return () => clearTimeout(timer);
+        }
+    }, [state.currentNodeId]);
     
     const prevNode = useMemo(() => {
         if (node?.type !== 'choice') return null;
@@ -107,20 +116,39 @@ export default function GamePage() {
         if (result.lastAchievementId) { setToastAchId(result.lastAchievementId); window.setTimeout(() => setToastAchId(null), 3500); }
     };
 
-    const handleScreenClick = () => { if (node.type === "dialogue" && !dailySummary && !crisisAlert) onContinue(); };
+    const handleScreenClick = () => { 
+        if (dailySummary || crisisAlert) return;
+        // 如果有自动播放时长，锁定点击，强制玩家看完
+        if ('autoPlayDuration' in node && (node as NarrationNode).autoPlayDuration) return;
+        
+        if (node.type === "dialogue" || node.type === "achievement" || node.type === "narration") {
+            onContinue(); 
+        }
+    };
 
     const getBgStyle = () => {
-        if (node.bg === "room") return "bg-[url('/room.png')] bg-cover bg-center";
-        if (node.bg === "village") return "bg-[url('/village.png')] bg-cover bg-center";
+        if (node.bg === "room") return "bg-[url('/room.png')]";
+        if (node.bg === "village") return "bg-[url('/village.png')]";
+        if (node.bg === "ruins") return "bg-[url('/ruins.png')]"; // 饥荒废墟
+        if (node.bg === "fire") return "bg-[url('/fire.png')]";   // 暴乱烈火
+        if (node.bg === "dawn") return "bg-[url('/dawn.png')]";   // 真结局破晓
         return "bg-black"; 
     };
 
     const isMoneyPrinterUnlocked = state.completedEvents?.includes("event5_choice");
+    const isEndingPhase = node.type === "narration" || node.type === "achievement" || node.type === "title_secret";
 
     return (
         <main className="relative w-full h-screen overflow-hidden bg-black text-white" onClick={handleScreenClick}>
-            <div className={`absolute inset-0 z-0 transition-all duration-[1500ms] ease-in-out ${getBgStyle()}`} />
-            <div className={`absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent z-0 pointer-events-none transition-opacity duration-1000 ${node.type === "idle" ? "opacity-0" : "opacity-100"}`} />
+            {/*  动态背景层：结局时高亮展现 */}
+            <div 
+                className={`absolute inset-0 transition-all duration-[3000ms] ease-in-out z-0 bg-cover bg-center ${getBgStyle()} ${
+                    isEndingPhase && node.bg !== "black" ? "opacity-90 blur-none scale-100" : "opacity-100"
+                }`} 
+            />
+            <div className={`absolute inset-0 transition-opacity duration-[3000ms] bg-gradient-to-t from-black via-black/40 to-transparent z-0 ${
+                isEndingPhase ? "opacity-40" : (node.type === "idle" ? "opacity-0" : "opacity-100")
+            }`} />
 
             {/* 隐藏头像：只有在非闲置、且非结局的情况下才显示 */}
             {node.type !== "idle" && node.type !== "title_secret" && (
@@ -135,6 +163,13 @@ export default function GamePage() {
             )}
 
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-end pointer-events-none">
+                {node.type === "narration" && (
+                    <div className="w-full flex-1 flex items-center justify-center p-8 pointer-events-auto">
+                        <p className="text-xl md:text-3xl text-zinc-200 italic text-center leading-relaxed animate-[fadeIn_1.5s_ease-in] drop-shadow-lg whitespace-pre-wrap">
+                            {('text' in node) ? node.text : ""}
+                        </p>
+                    </div>
+                )}
                 {node.type === "choice" && <GenshinChoiceOverlay choices={(node as ChoiceNode).choices} onChoose={onChoose} />}
                 {node.type === "dialogue" && (
                     <div className="pointer-events-auto w-full flex justify-center">
@@ -203,9 +238,30 @@ export default function GamePage() {
                     </div>
                 )}
 
-                {/* 👇 核心新增：游戏内的所有电影级大结局！ */}
+                {/* 全屏史诗成就弹窗 (与 app/page.tsx 完全一致) */}
+                {node.type === "achievement" && (
+                <div className="flex-1 flex flex-col items-center justify-start p-8 pt-[20vh] w-full animate-[fadeIn_2s_ease-in]">
+                    <div className="max-w-lg w-full rounded-2xl border border-yellow-500/50 bg-black/80 p-6 shadow-[0_0_60px_rgba(234,179,8,0.2)] backdrop-blur-md animate-[bounceIn_1s_ease-out]">
+                    <div className="flex items-start gap-6">
+                        <div className="text-5xl drop-shadow-lg mt-2">🏆</div>
+                        <div className="flex-1">
+                        <div className="text-sm text-yellow-500/80 font-bold uppercase tracking-widest mb-1">Achievement Unlocked</div>
+                        <div className="text-2xl text-yellow-400 font-bold mb-2">{node.text}</div>
+                        {('description' in node && node.description) && (
+                            <div className="text-sm text-zinc-300 leading-relaxed border-t border-yellow-500/30 pt-3 mt-2 font-serif">
+                                {node.description}
+                            </div>
+                        )}
+                        </div>
+                    </div>
+                    </div>
+                    <p className="mt-12 text-zinc-200 animate-pulse">(点击进入结局)</p>
+                </div>
+                )}
+
+                {/* 游戏内的所有电影级大结局！ */}
                 {node.type === "title_secret" && (
-                    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center w-full bg-black/90 backdrop-blur-sm animate-[fadeIn_3s_ease-in] pointer-events-auto">
+                    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center w-full bg-black animate-[fadeIn_3s_ease-in] pointer-events-auto">
                         <h1 className="text-4xl md:text-6xl font-serif tracking-widest text-white mb-6 drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] text-center px-4">
                             {('speaker' in node && node.speaker) ? node.speaker : "【游戏结束】"}
                         </h1>
@@ -228,18 +284,36 @@ export default function GamePage() {
             {/* OVERLAYS (结算与警报保持不变) */}
             {dailySummary && !crisisAlert && (
                 <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-                    <div className="bg-zinc-900 border border-white/20 p-8 rounded-3xl w-80 shadow-2xl animate-[slideUp_0.4s_ease-out]">
+                    <div className="bg-zinc-900 border border-white/20 p-8 rounded-3xl w-96 shadow-2xl animate-[slideUp_0.4s_ease-out]">
                         <h2 className="text-2xl font-bold text-center text-white mb-6 border-b border-white/10 pb-4">第 {dailySummary.day} 天结算单</h2>
                         <div className="space-y-4 text-lg">
                             <div className="flex justify-between text-green-400"><span>💰 财政入账:</span> <span>+¥{dailySummary.income}</span></div>
                             <div className="flex justify-between text-amber-400"><span>🌾 基础采摘与产出:</span> <span>+{dailySummary.foodProd} kg</span></div>
                             <div className="flex justify-between text-red-400"><span>口 消耗储备:</span> <span>-{dailySummary.foodCons} kg</span></div>
+                            
                             {dailySummary.starved > 0 && (
                                 <div className="text-center bg-red-500/20 text-red-400 p-2 rounded-lg font-bold animate-pulse mt-4">💀 饿死 {dailySummary.starved} 人</div>
                             )}
-                            {dailySummary.messages.map((m, i) => (
-                                <div key={i} className="text-sm text-amber-500 mt-2 text-center leading-relaxed">{m}</div>
-                            ))}
+
+                            {/* 👇 新增：每日宏观指数收盘大盘！ */}
+                            <div className="border-t border-white/10 pt-4 mt-4 space-y-2 text-sm font-mono bg-black/40 p-4 rounded-xl shadow-inner">
+                                <div className="text-zinc-500 mb-2 text-xs font-bold tracking-widest text-center">📊 宏观指数收盘价</div>
+                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>人口 (POP):</span> <span>{dailySummary.macro.population}</span></div>
+                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>总值 (GDP):</span> <span className="text-yellow-400">¥{dailySummary.macro.gdp}</span></div>
+                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>幸福 (HAP):</span> <span className={dailySummary.macro.happiness < 40 ? "text-red-400 font-bold" : "text-green-400"}>{dailySummary.macro.happiness} / 100</span></div>
+                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>生产 (PROD):</span> <span className={dailySummary.macro.productivity < 80 ? "text-red-400 font-bold" : "text-blue-400"}>{dailySummary.macro.productivity}</span></div>
+                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>物价 (CPI):</span> <span className={dailySummary.macro.cpi > 120 ? "text-red-400 font-bold" : ""}>{dailySummary.macro.cpi}</span></div>
+                                <div className="flex justify-between text-white pb-1"><span>失业 (UNEMP):</span> <span className={dailySummary.macro.unemploymentRate > 20 ? "text-red-400 font-bold" : ""}>{dailySummary.macro.unemploymentRate}%</span></div>
+                            </div>
+
+                            {/* 事件触发时的提示语 */}
+                            {dailySummary.messages.length > 0 && (
+                                <div className="pt-2">
+                                    {dailySummary.messages.map((m, i) => (
+                                        <div key={i} className="text-sm text-amber-500 mt-1 text-center leading-relaxed font-bold">{m}</div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         <button onClick={() => setDailySummary(null)} className="mt-8 w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-gray-200 transition-all">确认</button>
                     </div>
@@ -278,7 +352,7 @@ export default function GamePage() {
                             setState(next); setDailySummary(null); setCrisisAlert(null);
                         }}
                         className="bg-red-600 hover:bg-red-500 text-white font-bold text-2xl px-12 py-4 rounded-full shadow-[0_0_40px_rgba(239,68,68,0.5)] transition-all hover:scale-110 active:scale-95"
-                    >前往处理</button>
+                    >继续</button>
                 </div>
             )}
 
