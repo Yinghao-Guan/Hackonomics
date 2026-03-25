@@ -40,8 +40,8 @@ const SCRIPT: SceneNode[] = [
   { type: "dialogue", speaker: "大妈二", text: "那还当不当村长了？", avatar: "🧓", bg: "room" },
   
   // 玩家选项
-  { type: "choice", choices: ["一愣：“村长？” 你看向驴问：“她们....在说什么？”"], avatar: "🐴", bg: "room" },
-  { type: "dialogue", speaker: "你", text: "一愣：“村长？” 你看向驴问：“她们....在说什么？”", avatar: "👤", bg: "room" },
+  { type: "choice", choices: ["村长？ 她们....在说什么？"], avatar: "🐴", bg: "room" },
+  { type: "dialogue", speaker: "你", text: "你一愣：“村长？” 你看向驴问：“她们....在说什么？”", avatar: "👤", bg: "room" },
   
   { type: "dialogue", speaker: "驴", text: "简单来说，这个村子快撑不下去了，这里的人连最简单的算术都算不明白...", avatar: "🐴", bg: "room" },
   { type: "dialogue", speaker: "驴", text: "而你这个外来者便成了他们的希望，他们在讨论让你当村长。", avatar: "🐴", bg: "room" },
@@ -252,7 +252,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <p className="mt-12 text-zinc-500 animate-pulse">(点击了解真相)</p>
+            <p className="mt-12 text-zinc-200 animate-pulse">(点击进入结局)</p>
           </div>
         )}
 
