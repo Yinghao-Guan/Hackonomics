@@ -2,10 +2,11 @@
 import type { Effect, GameStats } from "./nodes";
 import type { GameState } from "./gameState";
 import { clampStats } from "./gameState";
+import type { Lang } from "./translations";
+import { ENGINE_MSG, CRISIS_EN } from "./translations";
 
 export type DailySummary = {
     day: number; foodProd: number; foodCons: number; starved: number; income: number; messages: string[];
-    // 把当天的宏观指标也打包送出去
     macro: { population: number; happiness: number; productivity: number; cpi: number; unemploymentRate: number; gdp: number; };
 };
 
@@ -13,82 +14,113 @@ export type CrisisAlert = {
     eventId: string; title: string; description: string; shockEffects: Effect[];
 };
 
-export function processDailyTick(state: GameState): { state: GameState, summary: DailySummary, crisis: CrisisAlert | null } {
+// Raw crisis definitions in Chinese (source of truth)
+const CRISIS_ZH = {
+    allStarved:  { title: "全村覆没",  description: "最后一名村民也倒下了。这片土地重新归于死寂。" },
+    exiled:      { title: "暴民起义",  description: "彻底绝望的村民冲破了村长办公室！他们剥夺了你的权力，准备将你永远流放！" },
+    riot:        { title: "全村暴动",  description: "村民的怒火彻底点燃！他们砸毁了建筑，抢走了金库里的钱！" },
+    meatTempt:   { title: "肉食的诱惑", description: "村民对小麦感到厌烦，有人开始觊觎牧场里的牛羊，私自将大量战略储备粮喂给牲畜！" },
+    machinery:   { title: "机器的轰鸣", description: "研究院孵化出了全自动农具，大幅提升了生产力，但也瞬间摧毁了大量传统农夫的生计！" },
+    bottleneck:  { title: "流通的瓶颈", description: "市场建成了，但以物易物的效率太低，财政库因为前期建设彻底枯竭，桥梁工程被迫停工。" },
+    monopoly:    { title: "资本的獠牙", description: "矿产大开发带来了垄断。精明的商人控制了铁矿，瞬间将所有农具价格提高了三倍！" },
+    pollution:   { title: "黑色的河流", description: "大规模的基建导致无节制的砍伐。河流被严重污染，渔民和老人开始生病倒下！" },
+    blizzard:    { title: "寒冬与死寂", description: "极寒暴风雪突然降临！所有人闭门不出疯狂存钱，市场需求瞬间坍塌！" },
+    plague:      { title: "瘟疫的阴影", description: "一场瘟疫逼近村庄，急需巨资修建净水设施。恐慌情绪蔓延！" },
+    dumping:     { title: "外来的倾销", description: "邻村用极其廉价的铁器涌入市场，导致本地铁匠铺当场破产！" },
+    currencyWar: { title: "货币战争",  description: "邻村恶意大幅贬值货币！我们出口的小麦变得极其昂贵，贸易订单瞬间归零！" },
+};
+
+function makeCrisis(
+    key: keyof typeof CRISIS_ZH,
+    eventId: string,
+    shockEffects: Effect[],
+    lang: Lang
+): CrisisAlert {
+    const zh = CRISIS_ZH[key];
+    const en = CRISIS_EN[eventId];
+    const { title, description } = lang === "en" && en ? en : zh;
+    return { eventId, title, description, shockEffects };
+}
+
+export function processDailyTick(
+    state: GameState,
+    lang: Lang = "zh"
+): { state: GameState; summary: DailySummary; crisis: CrisisAlert | null } {
     let next = structuredClone(state);
     let s = next.stats;
-    let summary: DailySummary = { day: s.day, foodProd: 0, foodCons: 0, starved: 0, income: 0, messages: [], macro: { population: 0, happiness: 0, productivity: 0, cpi: 0, unemploymentRate: 0, gdp: 0 } };
+    const msg = ENGINE_MSG[lang];
+    let summary: DailySummary = {
+        day: s.day, foodProd: 0, foodCons: 0, starved: 0, income: 0, messages: [],
+        macro: { population: 0, happiness: 0, productivity: 0, cpi: 0, unemploymentRate: 0, gdp: 0 },
+    };
 
-    // --- 1. 农业与生存结算 ---
-    const baseForaging = Math.floor(s.population * 0.4); 
-    // 正常生产力是 100，倍率为 1.0。如果蹦迪导致生产力掉到 80，农场产出直接打 8 折！
-    const prodMultiplier = Math.max(0.1, s.productivity / 100); 
+    // --- 1. Agriculture & survival ---
+    const baseForaging = Math.floor(s.population * 0.4);
+    const prodMultiplier = Math.max(0.1, s.productivity / 100);
     const farmingOutput = Math.floor(((s.farmLevel * 8) + (s.pastureLevel * 4)) * prodMultiplier);
-    summary.foodProd = baseForaging + farmingOutput
-    summary.foodCons = s.population; 
-    
+    summary.foodProd = baseForaging + farmingOutput;
+    summary.foodCons = s.population;
+
     s.foodStock += summary.foodProd;
     s.foodStock -= summary.foodCons;
 
     if (s.foodStock < 0) {
-        // 👇 平衡性修复：大幅提高死亡速度（缺口除以1.5），让人口迅速归零
-        summary.starved = Math.ceil(Math.abs(s.foodStock) / 1.5); 
+        summary.starved = Math.ceil(Math.abs(s.foodStock) / 1.5);
         if (summary.starved > 0) {
             s.population -= summary.starved;
-            // 👇 平衡性修复：饿死人不再按人头扣幸福度（避免瞬间暴动），而是固定恐慌值
-            s.happiness -= 10; 
-            s.productivity -= summary.starved * 5; 
-            summary.messages.push(`⚠️ 饥荒蔓延：储备耗尽，惨死 ${summary.starved} 人！`);
+            s.happiness -= 10;
+            s.productivity -= summary.starved * 5;
+            summary.messages.push(msg.famineSpread(summary.starved));
         } else {
-            summary.messages.push(`⚠️ 粮食短缺：全村陷入饥饿，虚弱导致生产力骤降。`);
+            summary.messages.push(msg.foodShortage);
             s.productivity -= 5;
-            s.happiness -= 5; 
+            s.happiness -= 5;
         }
         s.foodStock = 0;
     }
 
-    // --- 2. 经济与税收结算 ---
+    // --- 2. Economy & tax ---
     let baseIncome = (s.population * 5) + (s.marketLevel * 150) + (s.productivity * 3) + (s.mineLevel * 300 * s.techLevel);
-    
+
     if (s.happiness <= 30) {
-        baseIncome = Math.floor(baseIncome * 0.2); 
-        s.productivity = Math.max(0, s.productivity - 15); 
-        summary.messages.push(`😡 暴乱边缘：村民罢工抗议，税收枯竭，设施遭到破坏！`);
+        baseIncome = Math.floor(baseIncome * 0.2);
+        s.productivity = Math.max(0, s.productivity - 15);
+        summary.messages.push(msg.riotEdge);
     } else if (s.happiness < 50) {
-        baseIncome = Math.floor(baseIncome * 0.6); 
-        s.productivity = Math.max(0, s.productivity - 5); 
-        summary.messages.push(`😤 民怨沸腾：村民消极怠工，税收大减。`);
+        baseIncome = Math.floor(baseIncome * 0.6);
+        s.productivity = Math.max(0, s.productivity - 5);
+        summary.messages.push(msg.discontent);
     } else if (s.happiness > 80) {
-        baseIncome = Math.floor(baseIncome * 1.3); 
+        baseIncome = Math.floor(baseIncome * 1.3);
     }
 
     summary.income = Math.floor(baseIncome);
     s.money += summary.income;
 
-    // --- 3. 宏观指标的深度连动 ---
+    // --- 3. Macro linkage ---
     if (s.gdp > 3000 && s.happiness >= 70 && s.foodStock > s.population * 3) {
         const immigrants = Math.max(1, Math.floor(s.gdp / 2500));
         s.population += immigrants;
-        summary.messages.push(`🌟 繁荣之城：丰衣足食吸引了 ${immigrants} 名流民定居！`);
+        summary.messages.push(msg.immigrants(immigrants));
     }
-    
+
     if (s.cpi > 150) {
         s.happiness -= 15;
         s.productivity -= 10;
-        summary.messages.push(`💸 恶性通胀：手中的钱变成废纸，民不聊生！`);
+        summary.messages.push(msg.hyperinflation);
     } else if (s.cpi > 120) {
         s.happiness -= 5;
-        summary.messages.push(`🛒 物价飞涨：生活成本攀升，引发不满。`);
-    }
-    
-    if (s.unemploymentRate > 30) {
-        s.happiness -= 10;
-        summary.messages.push(`📉 绝望蔓延：遍地无业游民，社会治安恶化！`);
+        summary.messages.push(msg.priceSurge);
     }
 
-    // 👇 新增：仓廪实而知礼节 (自动恢复幸福度)
+    if (s.unemploymentRate > 30) {
+        s.happiness -= 10;
+        summary.messages.push(msg.unemployment);
+    }
+
     if (s.foodStock > s.population * 2 && s.unemploymentRate <= 15 && s.cpi <= 120 && s.happiness < 90) {
         s.happiness += 2;
-        summary.messages.push(`🍞 仓廪实而知礼节：生活安定，幸福度自然回升。`);
+        summary.messages.push(msg.stability);
     }
 
     s.actionPoints = 3;
@@ -96,9 +128,9 @@ export function processDailyTick(state: GameState): { state: GameState, summary:
 
     next.stats = clampStats(s);
     next.stats = recalculateMacroEconomics(next.stats);
-    next.stats = clampStats(next.stats); 
+    next.stats = clampStats(next.stats);
 
-    let logText = `【第${summary.day}天结账】产粮+${summary.foodProd} 消耗-${summary.foodCons} | 资金+${summary.income}`;
+    let logText = msg.dailyLog(summary.day, summary.foodProd, summary.foodCons, summary.income);
     if (summary.messages.length > 0) logText += ` | ${summary.messages.join(" ")}`;
     next.log.unshift({ ts: Date.now(), text: logText });
 
@@ -107,33 +139,53 @@ export function processDailyTick(state: GameState): { state: GameState, summary:
     const isDone = (id: string) => h.includes(id);
 
     if (next.stats.population <= 0) {
-        crisis = { eventId: "bad_ending_starved", title: "全村覆没", description: "最后一名村民也倒下了。这片土地重新归于死寂。", shockEffects: [] };
+        crisis = makeCrisis("allStarved", "bad_ending_starved", [], lang);
     } else if (next.stats.happiness <= 0) {
-        crisis = { eventId: "bad_ending_exiled", title: "暴民起义", description: "彻底绝望的村民冲破了村长办公室！他们剥夺了你的权力，准备将你永远流放！", shockEffects: [] };
-    } 
-    else if (next.stats.happiness <= 20 && !isDone("event_riot")) {
-         crisis = { eventId: "idle_main", title: "全村暴动", description: "村民的怒火彻底点燃！他们砸毁了建筑，抢走了金库里的钱！", shockEffects: [{ type: "add", key: "money", value: -1000 }, { type: "set", key: "marketLevel", value: 0 }, { type: "add", key: "population", value: -3 }] };
+        crisis = makeCrisis("exiled", "bad_ending_exiled", [], lang);
+    } else if (next.stats.happiness <= 20 && !isDone("event_riot")) {
+        crisis = makeCrisis("riot", "idle_main", [
+            { type: "add", key: "money", value: -1000 },
+            { type: "set", key: "marketLevel", value: 0 },
+            { type: "add", key: "population", value: -3 },
+        ], lang);
         next.completedEvents.push("event_riot");
-    }
-    else {
+    } else {
         if (next.stats.pastureLevel > 0 && !isDone("event2_start")) {
-            crisis = { eventId: "event2_start", title: "肉食的诱惑", description: "村民对小麦感到厌烦，有人开始觊觎牧场里的牛羊，私自将大量战略储备粮喂给牲畜！", shockEffects: [{ type: "add", key: "foodStock", value: -15 }] };
+            crisis = makeCrisis("meatTempt", "event2_start", [{ type: "add", key: "foodStock", value: -15 }], lang);
         } else if (next.stats.academyLevel > 0 && !isDone("event4_start")) {
-            crisis = { eventId: "event4_start", title: "机器的轰鸣", description: "研究院孵化出了全自动农具，大幅提升了生产力，但也瞬间摧毁了大量传统农夫的生计！", shockEffects: [{ type: "add", key: "unemploymentRate", value: 35 }, { type: "add", key: "productivity", value: 50 }] };
+            crisis = makeCrisis("machinery", "event4_start", [
+                { type: "add", key: "unemploymentRate", value: 35 },
+                { type: "add", key: "productivity", value: 50 },
+            ], lang);
         } else if (next.stats.marketLevel > 0 && !isDone("event5_start")) {
-            crisis = { eventId: "event5_start", title: "流通的瓶颈", description: "市场建成了，但以物易物的效率太低，财政库因为前期建设彻底枯竭，桥梁工程被迫停工。", shockEffects: [{ type: "add", key: "money", value: -1500 }] };
+            crisis = makeCrisis("bottleneck", "event5_start", [{ type: "add", key: "money", value: -1500 }], lang);
         } else if (next.stats.mineLevel > 0 && !isDone("event6_start")) {
-            crisis = { eventId: "event6_start", title: "资本的獠牙", description: "矿产大开发带来了垄断。精明的商人控制了铁矿，瞬间将所有农具价格提高了三倍！", shockEffects: [{ type: "add", key: "cpi", value: 50 }, { type: "add", key: "happiness", value: -25 }] };
+            crisis = makeCrisis("monopoly", "event6_start", [
+                { type: "add", key: "cpi", value: 50 },
+                { type: "add", key: "happiness", value: -25 },
+            ], lang);
         } else if (next.stats.farmLevel > 0 && next.stats.pastureLevel > 0 && next.stats.academyLevel > 0 && !isDone("event3_start")) {
-            crisis = { eventId: "event3_start", title: "黑色的河流", description: "大规模的基建导致无节制的砍伐。河流被严重污染，渔民和老人开始生病倒下！", shockEffects: [{ type: "add", key: "happiness", value: -30 }, { type: "add", key: "population", value: -2 }] };
+            crisis = makeCrisis("pollution", "event3_start", [
+                { type: "add", key: "happiness", value: -30 },
+                { type: "add", key: "population", value: -2 },
+            ], lang);
         } else if (next.stats.day >= 6 && next.stats.day <= 15 && !isDone("event7_start") && Math.random() < 0.3) {
-            crisis = { eventId: "event7_start", title: "寒冬与死寂", description: "极寒暴风雪突然降临！所有人闭门不出疯狂存钱，市场需求瞬间坍塌！", shockEffects: [{ type: "add", key: "gdp", value: -300 }, { type: "add", key: "unemploymentRate", value: 20 }] };
+            crisis = makeCrisis("blizzard", "event7_start", [
+                { type: "add", key: "gdp", value: -300 },
+                { type: "add", key: "unemploymentRate", value: 20 },
+            ], lang);
         } else if (!isDone("event8_start") && ["event1_choice","event2_choice","event3_choice","event4_choice","event5_choice","event6_choice","event7_choice"].every(isDone) && Math.random() < 0.4) {
-            crisis = { eventId: "event8_start", title: "瘟疫的阴影", description: "一场瘟疫逼近村庄，急需巨资修建净水设施。恐慌情绪蔓延！", shockEffects: [{ type: "add", key: "happiness", value: -25 }] };
+            crisis = makeCrisis("plague", "event8_start", [{ type: "add", key: "happiness", value: -25 }], lang);
         } else if (isDone("event8_choice") && !isDone("event9_start") && Math.random() < 0.4) {
-            crisis = { eventId: "event9_start", title: "外来的倾销", description: "邻村用极其廉价的铁器涌入市场，导致本地铁匠铺当场破产！", shockEffects: [{ type: "add", key: "unemploymentRate", value: 25 }, { type: "add", key: "cpi", value: -20 }] };
+            crisis = makeCrisis("dumping", "event9_start", [
+                { type: "add", key: "unemploymentRate", value: 25 },
+                { type: "add", key: "cpi", value: -20 },
+            ], lang);
         } else if (isDone("event9_choice") && !isDone("event10_start") && Math.random() < 0.4) {
-            crisis = { eventId: "event10_start", title: "货币战争", description: "邻村恶意大幅贬值货币！我们出口的小麦变得极其昂贵，贸易订单瞬间归零！", shockEffects: [{ type: "add", key: "gdp", value: -200 }, { type: "add", key: "foodStock", value: 40 }] };
+            crisis = makeCrisis("currencyWar", "event10_start", [
+                { type: "add", key: "gdp", value: -200 },
+                { type: "add", key: "foodStock", value: 40 },
+            ], lang);
         }
     }
 
@@ -143,7 +195,7 @@ export function processDailyTick(state: GameState): { state: GameState, summary:
         productivity: next.stats.productivity,
         cpi: next.stats.cpi,
         unemploymentRate: next.stats.unemploymentRate,
-        gdp: next.stats.gdp
+        gdp: next.stats.gdp,
     };
 
     return { state: next, summary, crisis };
@@ -156,22 +208,23 @@ function recalculateMacroEconomics(stats: GameStats): GameStats {
     const unemployed = Math.max(0, laborForce - jobsAvailable);
     next.unemploymentRate = laborForce > 0 ? Math.round((unemployed / laborForce) * 100) : 0;
 
-    const consumption = (next.population * 20) + (next.marketLevel * 300) + (next.productivity * 2); 
-    const investment = (next.techLevel * 500) + (next.academyLevel * 800) + (next.mineLevel * 1200);  
-    const govtSpending = next.money * 0.1;    
+    const consumption = (next.population * 20) + (next.marketLevel * 300) + (next.productivity * 2);
+    const investment = (next.techLevel * 500) + (next.academyLevel * 800) + (next.mineLevel * 1200);
+    const govtSpending = next.money * 0.1;
     next.gdp = Math.round(consumption + investment + govtSpending);
 
-    const moneySupplyRatio = Math.max(1, next.money) / 5000; 
-    const productionRatio = Math.max(0.01, next.productivity / 100); 
+    const moneySupplyRatio = Math.max(1, next.money) / 5000;
+    const productionRatio = Math.max(0.01, next.productivity / 100);
     const inflationFactor = moneySupplyRatio / productionRatio;
     next.cpi = Math.round(100 * inflationFactor);
 
     return next;
 }
 
-export function applyEffects(state: GameState, effects: Effect[]): { state: GameState; lastAchievementId?: string } {
+export function applyEffects(state: GameState, effects: Effect[], lang: Lang = "zh"): { state: GameState; lastAchievementId?: string } {
     let next: GameState = structuredClone(state);
     let lastAchievementId: string | undefined;
+    const msg = ENGINE_MSG[lang];
 
     for (const e of effects) {
         switch (e.type) {
@@ -183,14 +236,14 @@ export function applyEffects(state: GameState, effects: Effect[]): { state: Game
                 if (!exists) {
                     next.achievements.unshift({ id: e.id, title: e.title, description: e.description, unlockedAt: Date.now() });
                     lastAchievementId = e.id;
-                    next.log.unshift({ ts: Date.now(), text: `成就解锁：${e.title}` });
+                    next.log.unshift({ ts: Date.now(), text: msg.achievementLog(e.title) });
                 }
                 break;
             }
             case "goto": next.currentNodeId = e.nodeId; break;
         }
     }
-    
+
     next.stats = clampStats(next.stats);
     next.stats = recalculateMacroEconomics(next.stats);
     next.stats = clampStats(next.stats);

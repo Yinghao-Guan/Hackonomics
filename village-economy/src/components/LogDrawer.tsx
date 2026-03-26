@@ -1,5 +1,8 @@
 // src/components/LogDrawer.tsx
+"use client";
 import type { LogItem } from "@/lib/gameState";
+import { useLanguage } from "@/lib/language";
+import { UI } from "@/lib/translations";
 
 export default function LogDrawer({
     open,
@@ -8,12 +11,15 @@ export default function LogDrawer({
     open: boolean;
     log: LogItem[];
 }) {
+    const { lang } = useLanguage();
+    const t = UI[lang];
+
     if (!open) return null;
 
     return (
         <div className="fixed right-4 top-12 z-40">
             <div className="w-[min(420px,90vw)] rounded-2xl border border-white/10 bg-black/60 p-4 backdrop-blur shadow-2xl">
-                <div className="mb-2 text-sm font-bold text-amber-500">村庄大事记 (Event Log)</div>
+                <div className="mb-2 text-sm font-bold text-amber-500">{t.logTitle}</div>
                 <div className="max-h-[60vh] space-y-2 overflow-auto pr-1 custom-scrollbar">
                     {log.map((item, index) => (
                         <div key={`${item.ts}-${index}`} className="rounded-xl bg-white/5 p-3 text-sm text-white/90 border border-white/5">
