@@ -75,6 +75,7 @@ export type TitleSecretNode = {
     speaker?: string;
     text?: string;
     bg?: BgType;
+    next?: string;
 };
 
 export type AchievementNode = { id: string; type: "achievement"; text: string; description?: string; bg?: BgType; next: string; };
@@ -88,7 +89,7 @@ export type NarrationNode = {
     next: string; 
 };
 
-export type Node = DialogueNode | ChoiceNode | IdleNode | TitleSecretNode | AchievementNode | NarrationNode;
+export type Node = DialogueNode | ChoiceNode | IdleNode | TitleSecretNode | AchievementNode | NarrationNode | ProfileNode;
 
 export const START_NODE_ID = "event1_start";
 
@@ -805,11 +806,13 @@ export const NODES: Record<string, Node> = {
         text: "也许，你只是一个在不同情境下做出不同选择的普通人。而这，才是经济学真正想研究的对象。",
         next: "epilogue_ach",
     },
+    epilogue_profile: { id: "epilogue_profile", type: "profile", bg: "black", next: "epilogue_profile" },
     epilogue_ach: { id: "epilogue_ach", type: "achievement", text: "时代的守望者 (The Watcher of Era)", description: "你经历了饥荒、通胀、垄断与暴动。你没有逃避，也没有被吞噬。你用权衡与妥协，硬生生地趟出了一条文明的活路。", bg: "dawn", next: "epilogue_final" },
     epilogue_final: { 
         id: "epilogue_final", type: "title_secret", bg: "black", 
         speaker: "【真结局：时代的守望者】", 
-        text: "你醒来并非为了统治，而是为了抉择。 —— 感谢游玩《Village Economy》" 
+        text: "你醒来并非为了统治，而是为了抉择。 —— 感谢游玩《Village Economy》",
+        next: "epilogue_profile",
     },
 
     // ─── 💀 坏结局 1：饿死殆尽 ───────────────────

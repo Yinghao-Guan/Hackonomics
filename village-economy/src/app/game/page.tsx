@@ -8,6 +8,7 @@ import LogDrawer from "@/components/LogDrawer";
 import AchievementToast from "@/components/AchievementToast";
 // import AvatarPlaceholder from "@/components/AvatarPlaceholder";
 import { NODES, START_NODE_ID, type ChoiceNode, type DialogueNode, type NarrationNode } from "@/lib/nodes";
+import EconomicProfile from "@/components/EconomicProfile";
 import { loadFromStorage, saveToStorage, clearStorage } from "@/lib/storage";
 import { newGameState, clampStats, type GameState } from "@/lib/gameState";
 import { applyEffects, type DailySummary, type CrisisAlert } from "@/lib/engine";
@@ -147,7 +148,7 @@ function GamePageInner() {
 
     const onAction = (actionNameZh: string, actionNameEn: string, effects: Effect[], apCost: number = 1) => {
         if (state.stats.actionPoints < apCost) return;
-        let next: GameState = structuredClone(state);
+        const next: GameState = structuredClone(state);
         next.stats.actionPoints -= apCost;
         next.log.unshift({ ts: Date.now(), zh: `${UI.zh.actionPrefix}${actionNameZh}`, en: `${UI.en.actionPrefix}${actionNameEn}` });
         const result = applyEffects(next, effects, lang);
@@ -171,7 +172,7 @@ function GamePageInner() {
     };
 
     const isMoneyPrinterUnlocked = state.completedEvents?.includes("event5_choice");
-    const isEndingPhase = node.type === "narration" || node.type === "achievement" || node.type === "title_secret";
+    const isEndingPhase = node.type === "narration" || node.type === "achievement" || node.type === "title_secret" || node.type === "profile";
 
     // For localized display of crisis/summary
     const displayCrisis = crisisAlert ? localizeCrisis(crisisAlert, lang) : null;
@@ -369,12 +370,21 @@ function GamePageInner() {
                         <p className="text-xl text-zinc-300 italic mb-16 tracking-widest drop-shadow-md text-center px-4 max-w-2xl leading-relaxed">
                             {"text" in node && (node as { text?: string }).text ? (node as { text: string }).text : ""}
                         </p>
-                        <button
-                            onClick={() => { clearStorage(); router.push("/"); }}
-                            className="group relative overflow-hidden rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-10 py-4 text-lg font-medium text-white transition-all hover:bg-white/20 hover:scale-105 cursor-pointer"
-                        >
-                            <span className="relative z-10">{t.restart}</span>
-                        </button>
+                        {"next" in node && (node as { next?: string }).next ? (
+                            <button
+                                onClick={() => { onContinue(); }}
+                                className="group relative overflow-hidden rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-10 py-4 text-lg font-medium text-white transition-all hover:bg-white/20 hover:scale-105 cursor-pointer"
+                            >
+                                <span className="relative z-10">{lang === "en" ? "View Profile" : "查看人格档案"}</span>
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => { clearStorage(); router.push("/"); }}
+                                className="group relative overflow-hidden rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-10 py-4 text-lg font-medium text-white transition-all hover:bg-white/20 hover:scale-105 cursor-pointer"
+                            >
+                                <span className="relative z-10">{t.restart}</span>
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
@@ -448,7 +458,7 @@ function GamePageInner() {
                     )}
                     <button
                         onClick={() => {
-                            let next = applyEffects(state, crisisAlert.shockEffects, lang).state;
+                            const next = applyEffects(state, crisisAlert.shockEffects, lang).state;
                             next.currentNodeId = crisisAlert.eventId;
                             if (!next.completedEvents) next.completedEvents = [];
                             next.completedEvents.push(crisisAlert.eventId);
@@ -461,6 +471,13 @@ function GamePageInner() {
                 </div>
             )}
 
+            {node.type === "profile" && (
+                <EconomicProfile
+                    choices={state.choices}
+                    achievements={state.achievements}
+                    lang={lang}
+                />
+            )}
             <LogDrawer open={logOpen} log={state.log} />
             <AchievementToast achievement={latestAchievement} onClose={() => setToastAchId(null)} />
             {node.bg === "village" && node.type !== "title_secret" && (
@@ -476,6 +493,8 @@ function GamePageInner() {
                 @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes bounceIn { 0% { transform: scale(0.9); opacity: 0; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+                @keyframes profileCardRise { 0% { transform: translateY(40px) scale(0.92); opacity: 0; } 70% { transform: translateY(-4px) scale(1.02); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+                @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
             `}} />
         </main>
     );
