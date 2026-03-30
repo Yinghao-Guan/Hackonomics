@@ -3,7 +3,7 @@ import type { Effect, GameStats } from "./nodes";
 import type { GameState } from "./gameState";
 import { clampStats } from "./gameState";
 import type { Lang } from "./translations";
-import { ENGINE_MSG, CRISIS_EN, ACHIEVEMENT_EN } from "./translations";
+import { ENGINE_MSG, CRISIS_EN } from "./translations";
 
 export type DailySummary = {
     day: number; foodProd: number; foodCons: number; starved: number; income: number; messages: string[];
@@ -48,15 +48,13 @@ export function processDailyTick(
 ): { state: GameState; summary: DailySummary; crisis: CrisisAlert | null } {
     let next = structuredClone(state);
     let s = next.stats;
-    const msgZh = ENGINE_MSG.zh;
-    const msgEn = ENGINE_MSG.en;
-    const zhMessages: string[] = [];
-    const enMessages: string[] = [];
+    const msg = ENGINE_MSG[lang];
     let summary: DailySummary = {
         day: s.day, foodProd: 0, foodCons: 0, starved: 0, income: 0, messages: [],
         macro: { population: 0, happiness: 0, productivity: 0, cpi: 0, unemploymentRate: 0, gdp: 0 },
     };
 
+    // --- 1. Agriculture & survival ---
     const baseForaging = Math.floor(s.population * 0.4);
     const prodMultiplier = Math.max(0.1, s.productivity / 100);
     const farmingOutput = Math.floor(((s.farmLevel * 8) + (s.pastureLevel * 4)) * prodMultiplier);
@@ -72,29 +70,26 @@ export function processDailyTick(
             s.population -= summary.starved;
             s.happiness -= 10;
             s.productivity -= summary.starved * 5;
-            zhMessages.push(msgZh.famineSpread(summary.starved));
-            enMessages.push(msgEn.famineSpread(summary.starved));
+            summary.messages.push(msg.famineSpread(summary.starved));
         } else {
-            zhMessages.push(msgZh.foodShortage);
-            enMessages.push(msgEn.foodShortage);
+            summary.messages.push(msg.foodShortage);
             s.productivity -= 5;
             s.happiness -= 5;
         }
         s.foodStock = 0;
     }
 
+    // --- 2. Economy & tax ---
     let baseIncome = (s.population * 5) + (s.marketLevel * 150) + (s.productivity * 3) + (s.mineLevel * 300 * s.techLevel);
 
     if (s.happiness <= 30) {
         baseIncome = Math.floor(baseIncome * 0.2);
         s.productivity = Math.max(0, s.productivity - 15);
-        zhMessages.push(msgZh.riotEdge);
-        enMessages.push(msgEn.riotEdge);
+        summary.messages.push(msg.riotEdge);
     } else if (s.happiness < 50) {
         baseIncome = Math.floor(baseIncome * 0.6);
         s.productivity = Math.max(0, s.productivity - 5);
-        zhMessages.push(msgZh.discontent);
-        enMessages.push(msgEn.discontent);
+        summary.messages.push(msg.discontent);
     } else if (s.happiness > 80) {
         baseIncome = Math.floor(baseIncome * 1.3);
     }
@@ -102,37 +97,31 @@ export function processDailyTick(
     summary.income = Math.floor(baseIncome);
     s.money += summary.income;
 
+    // --- 3. Macro linkage ---
     if (s.gdp > 3000 && s.happiness >= 70 && s.foodStock > s.population * 3) {
         const immigrants = Math.max(1, Math.floor(s.gdp / 2500));
         s.population += immigrants;
-        zhMessages.push(msgZh.immigrants(immigrants));
-        enMessages.push(msgEn.immigrants(immigrants));
+        summary.messages.push(msg.immigrants(immigrants));
     }
 
     if (s.cpi > 150) {
         s.happiness -= 15;
         s.productivity -= 10;
-        zhMessages.push(msgZh.hyperinflation);
-        enMessages.push(msgEn.hyperinflation);
+        summary.messages.push(msg.hyperinflation);
     } else if (s.cpi > 120) {
         s.happiness -= 5;
-        zhMessages.push(msgZh.priceSurge);
-        enMessages.push(msgEn.priceSurge);
+        summary.messages.push(msg.priceSurge);
     }
 
     if (s.unemploymentRate > 30) {
         s.happiness -= 10;
-        zhMessages.push(msgZh.unemployment);
-        enMessages.push(msgEn.unemployment);
+        summary.messages.push(msg.unemployment);
     }
 
     if (s.foodStock > s.population * 2 && s.unemploymentRate <= 15 && s.cpi <= 120 && s.happiness < 90) {
         s.happiness += 2;
-        zhMessages.push(msgZh.stability);
-        enMessages.push(msgEn.stability);
+        summary.messages.push(msg.stability);
     }
-
-    summary.messages = lang === "en" ? enMessages : zhMessages;
 
     s.actionPoints = 3;
     s.day += 1;
@@ -141,11 +130,9 @@ export function processDailyTick(
     next.stats = recalculateMacroEconomics(next.stats);
     next.stats = clampStats(next.stats);
 
-    let logZh = msgZh.dailyLog(summary.day, summary.foodProd, summary.foodCons, summary.income);
-    let logEn = msgEn.dailyLog(summary.day, summary.foodProd, summary.foodCons, summary.income);
-    if (zhMessages.length > 0) logZh += ` | ${zhMessages.join(" ")}`;
-    if (enMessages.length > 0) logEn += ` | ${enMessages.join(" ")}`;
-    next.log.unshift({ ts: Date.now(), zh: logZh, en: logEn });
+    let logText = msg.dailyLog(summary.day, summary.foodProd, summary.foodCons, summary.income);
+    if (summary.messages.length > 0) logText += ` | ${summary.messages.join(" ")}`;
+    next.log.unshift({ ts: Date.now(), text: logText });
 
     let crisis: CrisisAlert | null = null;
     const h = next.completedEvents || [];
@@ -237,21 +224,19 @@ function recalculateMacroEconomics(stats: GameStats): GameStats {
 export function applyEffects(state: GameState, effects: Effect[], lang: Lang = "zh"): { state: GameState; lastAchievementId?: string } {
     let next: GameState = structuredClone(state);
     let lastAchievementId: string | undefined;
-    const msgZh = ENGINE_MSG.zh;
-    const msgEn = ENGINE_MSG.en;
+    const msg = ENGINE_MSG[lang];
+
     for (const e of effects) {
         switch (e.type) {
             case "add": next.stats[e.key] = (next.stats[e.key] as number) + e.value; break;
             case "set": next.stats[e.key] = e.value; break;
-            case "log": next.log.unshift({ ts: Date.now(), zh: e.zh, en: e.en }); break;
+            case "log": next.log.unshift({ ts: Date.now(), text: e.text }); break;
             case "achievement": {
                 const exists = next.achievements.some((a) => a.id === e.id);
                 if (!exists) {
                     next.achievements.unshift({ id: e.id, title: e.title, description: e.description, unlockedAt: Date.now() });
                     lastAchievementId = e.id;
-                    const enAch = ACHIEVEMENT_EN[e.id];
-                    const enTitle = enAch?.title ?? e.title;
-                    next.log.unshift({ ts: Date.now(), zh: msgZh.achievementLog(e.title), en: msgEn.achievementLog(enTitle) });
+                    next.log.unshift({ ts: Date.now(), text: msg.achievementLog(e.title) });
                 }
                 break;
             }

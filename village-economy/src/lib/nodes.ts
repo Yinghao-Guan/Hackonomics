@@ -127,22 +127,22 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件一：生存的重量 ───────────────────────────────────────
     event1_start: {
-        id: "event1_start", type: "dialogue", speaker: "村民A", avatar: "👨‍🌾", bg: "room",
+        id: "event1_start", type: "dialogue", speaker: "村民A", avatar: "/avatar/villager1.png", bg: "room",
         text: "（门被猛地推开）不好了村长！粮仓里的粮食……不够所有人分了！", 
         next: "event1_prophet",
     },
     event1_prophet: {
-        id: "event1_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event1_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "欢迎上任，村长。顺带一提：冬天快到了。", 
         next: "event1_dialogue_1",
     },
     event1_dialogue_1: {
-        id: "event1_dialogue_1", type: "dialogue", speaker: "村民一（老人）", avatar: "👴", bg: "village",
+        id: "event1_dialogue_1", type: "dialogue", speaker: "村民一（老人）", avatar: "/avatar/old_villager.png", bg: "village",
         text: "我们年纪大了，少吃点也没事，把粮食留给年轻人吧……", 
         next: "event1_dialogue_2",
     },
     event1_dialogue_2: {
-        id: "event1_dialogue_2", type: "dialogue", speaker: "村民二（壮年）", avatar: "💪", bg: "village",
+        id: "event1_dialogue_2", type: "dialogue", speaker: "村民二（壮年）", avatar: "/avatar/strong_villager.png", bg: "village",
         text: "要是我们没力气干活，下个季节咱们全村都得饿死！必须保住干活的人！",  
         next: "event1_dialogue_3",
     },
@@ -152,13 +152,13 @@ export const NODES: Record<string, Node> = {
         next: "event1_prophet_2",
     },
     event1_prophet_2: {
-        id: "event1_prophet_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event1_prophet_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "有时候，不做选择本身也是一种选择。现在的库存只有 18kg，刚好够 18 个人活命。而你们有 20 张嘴。选吧，村长。", 
         next: "event1_choice",
     },
 
     event1_choice: {
-        id: "event1_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event1_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（当前小麦：18kg | 人口：20人 | 维持生命最低需求：1kg/人）",
         choices: [
             {
@@ -192,12 +192,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event1_ending: {
-        id: "event1_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event1_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "做完决定了？很好。", 
         next: "event1_ending_2",
     },
     event1_ending_2: {
-        id: "event1_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event1_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "请记住刚才的感觉。你做出选择的那一刻，你便永远地放弃了别的某种东西。在经济学里，这叫【机会成本 (Opportunity Cost)】。", 
         next: "idle_main", 
     },
@@ -205,23 +205,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件二：边际效用递减与资源转化 ───────────────────────────────────────
     event2_start: {
-        id: "event2_start", type: "dialogue", speaker: "村民一（母亲）", avatar: "👩", bg: "village",
+        id: "event2_start", type: "dialogue", speaker: "村民一（母亲）", avatar: "/avatar/poor_mum.png", bg: "village",
         text: "村长，孩子们连着吃了一个月的小麦糊糊，现在一看到麦子就干呕。昨天小女儿看着隔壁家的牛流口水，晚上哭着说梦话想吃口肉。您就行行好，拿些麦子去喂牛吧。",
         next: "event2_dialogue_2",
     },
     event2_dialogue_2: {
-        id: "event2_dialogue_2", type: "dialogue", speaker: "村民二（老伯）", avatar: "👴", bg: "village",
+        id: "event2_dialogue_2", type: "dialogue", speaker: "村民二（老伯）", avatar: "/avatar/angry_old.png", bg: "village",
         text: "荒唐！这可是救命的粮！现在吃饱了就开始挑剔，要是明年开春遇到旱灾倒春寒，拿什么活命？村长，你们这是在作孽，在糟蹋老天爷的恩赐啊！",
         next: "event2_prophet",
     },
     event2_prophet: {
-        id: "event2_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event2_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "你看，对快饿死的人来说，第一口面包是神迹；对吃撑的人来说，第一百口面包连狗都不想看。这就是边际效用递减法则（Law of Diminishing Marginal Utility）。所以村长大人，你是要做一个强迫大家居安思危的独裁者，还是纵容他们眼前的口腹之欲？",
         next: "event2_choice",
     },
 
     event2_choice: {
-        id: "event2_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event2_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（小麦库存：充裕 | 幸福度：停滞不前 | 牧场：新建）",
         choices: [
             {
@@ -255,12 +255,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event2_ending: {
-        id: "event2_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event2_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "你刚刚经历的，是经济学中最朴素的真理之一。",
         next: "event2_ending_2",
     },
     event2_ending_2: {
-        id: "event2_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event2_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "对快饿死的人来说，第一口面包是神迹；对吃撑的人来说，面包堆成山也无动于衷。每一单位额外消费带来的满足感，都在递减。这叫【边际效用递减法则 (Law of Diminishing Marginal Utility)】。",
         next: "idle_main", 
     },
@@ -268,23 +268,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件三：公地悲剧与负外部性 ───────────────────────────────────────────
     event3_start: {
-        id: "event3_start", type: "dialogue", speaker: "村民一（伐木工）", avatar: "🪓", bg: "village",
+        id: "event3_start", type: "dialogue", speaker: "村民一（伐木工）", avatar: "/avatar/wooder.png", bg: "village",
         text: "村长！没木头怎么盖新房子？大家总不能一直挤在漏风的破棚子里吧！我靠自己的力气多砍几棵树，让大家住得更暖和，我到底有什么错？",
         next: "event3_dialogue_2",
     },
     event3_dialogue_2: {
-        id: "event3_dialogue_2", type: "dialogue", speaker: "村民二（渔民）", avatar: "🎣", bg: "village",
+        id: "event3_dialogue_2", type: "dialogue", speaker: "村民二（渔民）", avatar: "/avatar/fisher.png", bg: "village",
         text: "咳咳……你看看这河水！全被木屑和泥巴毁了！我们打不到鱼不说，连喝口水都要闹肚子，村里的老人已经病倒了好几个！你们盖的新房，是用我们的命换的！",
         next: "event3_prophet",
     },
     event3_prophet: {
-        id: "event3_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event3_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "伐木工赚了木头的钱，却让全体村民承担了喝泥水的代价。当一块蛋糕属于所有人时，每个人都会想在别人吃完前咬下最大的一口。这就是公地悲剧（Tragedy of the Commons）。市场在负外部性（Negative Externality）面前，瞎了眼。村长，你要去当那个惹人厌的恶人来纠正它吗？",
         next: "event3_choice",
     },
 
     event3_choice: {
-        id: "event3_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event3_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（河畔树木遭到滥伐，水质持续恶化，渔民与伐木工矛盾激化）",
         choices: [
             {
@@ -318,12 +318,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event3_ending: {
-        id: "event3_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event3_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "你刚刚触碰到了经济学最令人头痛的问题之一。",
         next: "event3_ending_2",
     },
     event3_ending_2: {
-        id: "event3_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event3_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "当个人的理性行为，累积成集体的灾难，市场便失灵了。这叫【负外部性（Negative Externality）】与【公地悲剧（Tragedy of the Commons）】。解法从来不只一种，但每一种都要有人付出代价。",
         next: "idle_main", 
     },
@@ -331,23 +331,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件四：技术冲击与结构性失业 ────────────────────────────────────────
     event4_start: {
-        id: "event4_start", type: "dialogue", speaker: "村民一（农夫）", avatar: "👨‍🌾", bg: "village",
+        id: "event4_start", type: "dialogue", speaker: "村民一（农夫）", avatar: "/avatar/farmer.png", bg: "village",
         text: "村长，我为这个村子种了半辈子地！现在你弄来个不用人力的铁疙瘩，就把我们全赶出去了？我家里还有三个张嘴吃饭的人，你是要逼我们去死吗？",
         next: "event4_dialogue_2",
     },
     event4_dialogue_2: {
-        id: "event4_dialogue_2", type: "dialogue", speaker: "村民二（农场主）", avatar: "🏡", bg: "village",
+        id: "event4_dialogue_2", type: "dialogue", speaker: "村民二（农场主）", avatar: "/avatar/owner.png", bg: "village",
         text: "这是效率！有了新农具，全村的产粮翻倍，以后再也不用担心灾荒了！村长，时代要进步，总得有人做出牺牲吧？他们只会被淘汰！",
         next: "event4_prophet",
     },
     event4_prophet: {
-        id: "event4_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event4_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "旧时代的敲钟人，总是死于新时代的齿轮之下，这叫创造性破坏（Creative Destruction）。如果你为了几滴无用的眼泪停下脚步，这个村子就永远是个穷乡僻壤。但问题是，那些代价现在就活生生地站在你面前，你要如何面对他们？",
         next: "event4_choice",
     },
 
     event4_choice: {
-        id: "event4_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event4_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（新农具已引入，失业率从0%飙升至50%，失业者聚集广场抗议）",
         choices: [
             {
@@ -381,12 +381,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event4_ending: {
-        id: "event4_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event4_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "技术进步从不会问你的感受。",
         next: "event4_ending_2",
     },
     event4_ending_2: {
-        id: "event4_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event4_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "旧工作消亡，新工作诞生——这个循环叫【创造性破坏（Creative Destruction）】，熊彼特如是说。问题从来不是要不要变，而是谁来承担变的代价。",
         next: "idle_main", 
     },
@@ -394,23 +394,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件五：法定货币的诞生与通货膨胀 ──────────────────────────────────
     event5_start: {
-        id: "event5_start", type: "dialogue", speaker: "商贩", avatar: "🛒", bg: "village",
+        id: "event5_start", type: "dialogue", speaker: "商贩", avatar: "/avatar/sad_seller.png", bg: "village",
         text: "河对岸的物资进不来，没有桥，我们迟早要困死在这里！村长，大家都很信任你，只要你拿纸盖个章当钱用，先把造桥的料买回来，以后的日子肯定能好起来的！",
         next: "event5_dialogue_2",
     },
     event5_dialogue_2: {
-        id: "event5_dialogue_2", type: "dialogue", speaker: "寡妇", avatar: "👵", bg: "village",
+        id: "event5_dialogue_2", type: "dialogue", speaker: "寡妇", avatar: "/avatar/sad_old.png", bg: "village",
         text: "我攒了一辈子的硬币，就指望老了有个棺材本。你们要是乱印那种破纸头，到处都是钱，我的硬币不就变成废铁了吗？村长，你可不能去偷我们这些苦命人的救命钱啊！",
         next: "event5_prophet",
     },
     event5_prophet: {
-        id: "event5_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event5_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "印刷机是权力的魔杖。它能凭空造出雄伟的桥梁，也能悄无声息地偷走寡妇口袋里的最后半块铜板。这就是通货膨胀（Inflation）。村长，你要戴上这枚权力的魔戒吗？",
         next: "event5_choice",
     },
 
     event5_choice: {
-        id: "event5_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event5_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（财政库空虚，桥梁急需修建，村庄亟需贸易通道）",
         choices: [
             {
@@ -444,12 +444,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event5_ending: {
-        id: "event5_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event5_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "你刚刚做了一个关于货币本质的决定。",
         next: "event5_ending_2",
     },
     event5_ending_2: {
-        id: "event5_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event5_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "货币，不过是一张大家相信它有价值的纸。当发行者滥用这份信任，每一分钱都在悄悄贬值。这叫【通货膨胀（Inflation）】——权力最隐秘的税收形式。",
         next: "idle_main", 
     },
@@ -457,23 +457,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件六：垄力量与价格管制 ──────────────────────────────────────────
     event6_start: {
-        id: "event6_start", type: "dialogue", speaker: "农夫", avatar: "👨‍🌾", bg: "village",
+        id: "event6_start", type: "dialogue", speaker: "农夫", avatar: "/avatar/angry_villager.png", bg: "village",
         text: "三倍！一把破铁锄头他居然敢要三倍的价钱！他这是在喝我们的血！村长，你是我们的父母官，你要是再不管管这黑心商人，我们只能拿起石头跟他去拼命了！",
         next: "event6_dialogue_2",
     },
     event6_dialogue_2: {
-        id: "event6_dialogue_2", type: "dialogue", speaker: "矿主", avatar: "⛏️", bg: "village",
+        id: "event6_dialogue_2", type: "dialogue", speaker: "矿主", avatar: "/avatar/iron_owner.png", bg: "village",
         text: "这是我的矿，我雇人挖的铁，我当然有权定我想要的价。嫌贵？那你们用手去刨地啊。别忘了，村长，上个月村里的治安维护费可是我捐的，谁才是维持村子运转的人？",
         next: "event6_prophet",
     },
     event6_prophet: {
-        id: "event6_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event6_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "当市场失去竞争，那只看不见的手就会握成拳头，狠狠砸向消费者的脸。剥夺商人的定价权，还是看着农民流血？权力的天平，你打算往哪边倾斜？",
         next: "event6_choice",
     },
 
     event6_choice: {
-        id: "event6_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event6_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（矿主控制唯一铁矿，工具价格已涨至三倍，农业减产危机迫在眉睫）",
         choices: [
             {
@@ -507,12 +507,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event6_ending: {
-        id: "event6_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event6_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "市场从来不是天然公平的。",
         next: "event6_ending_2",
     },
     event6_ending_2: {
-        id: "event6_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event6_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "当一家企业控制了整个市场，看不见的手就变成了看不见的拳头。这叫【垄断（Monopoly）】。干预它的方式，决定了代价由谁承担。",
         next: "idle_main", 
     },
@@ -520,23 +520,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件七：宏观冲击与总需求不足 ───────────────────────────────────────
     event7_start: {
-        id: "event7_start", type: "dialogue", speaker: "餐厅老板", avatar: "🍜", bg: "village",
+        id: "event7_start", type: "dialogue", speaker: "餐厅老板", avatar: "/avatar/helpless.png", bg: "village",
         text: "村长，求求你救救我！大雪封路，连着半个月一个客人都没有，伙计们的工钱根本发不出！如果明天再没有进项，我就只能去跳冰窟窿了！",
         next: "event7_dialogue_2",
     },
     event7_dialogue_2: {
-        id: "event7_dialogue_2", type: "dialogue", speaker: "守财奴", avatar: "💰", bg: "village",
+        id: "event7_dialogue_2", type: "dialogue", speaker: "守财奴", avatar: "/avatar/money_saver.png", bg: "village",
         text: "外面冻死人，傻子才去下馆子吃饭？谁知道这暴风雪要刮到什么时候，把钱死死捂在口袋里熬过冬天，难道不是天经地义的做法吗？",
         next: "event7_prophet",
     },
     event7_prophet: {
-        id: "event7_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event7_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "对个人而言，危机时存钱是理性的；但当所有人同时存钱时，宏观经济的引擎就彻底熄火了。如果你不去强迫他们花钱，大家就一起在死寂的寒冬里拥抱着破产吧。",
         next: "event7_choice",
     },
 
     event7_choice: {
-        id: "event7_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event7_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（极寒暴风雪封路，全村疯狂存钱，餐厅濒临破产，节俭悖论爆发）",
         choices: [
             {
@@ -570,12 +570,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event7_ending: {
-        id: "event7_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event7_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "每个人都做了对自己最理性的事，整个村子却陷入了最不理性的困境。",
         next: "event7_ending_2",
     },
     event7_ending_2: {
-        id: "event7_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event7_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "当所有人同时节省，总需求便坍塌。这叫【节俭悖论（Paradox of Thrift）】——个人理性之和，有时等于集体的灾难。凯恩斯称之为宏观经济学最深的陷阱。",
         next: "idle_main", 
     },
@@ -583,23 +583,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件八：税收政策与公共产品 ──────────────────────────────────────────
     event8_start: {
-        id: "event8_start", type: "dialogue", speaker: "劳工", avatar: "⛏️", bg: "village",
+        id: "event8_start", type: "dialogue", speaker: "劳工", avatar: "/avatar/hungry_farmer.png", bg: "village",
         text: "瘟疫来了大家都要死！凭什么让我们这些饭都吃不饱的人，去跟那些住大房子的大财主交一样的钱？他们拔一根汗毛都比我们的腰粗！",
         next: "event8_dialogue_2",
     },
     event8_dialogue_2: {
-        id: "event8_dialogue_2", type: "dialogue", speaker: "富商", avatar: "🤵", bg: "village",
+        id: "event8_dialogue_2", type: "dialogue", speaker: "富商", avatar: "/avatar/richman.png", bg: "village",
         text: "我的财富是我辛辛苦苦起早贪黑赚来的，不是大风刮来的！我平时交的钱已经够多了，凭什么我越努力，就越要被你们这些穷鬼吸血去填坑？",
         next: "event8_prophet",
     },
     event8_prophet: {
-        id: "event8_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event8_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "税收，是文明的代价，还是合法的抢劫？数学很简单，但背后的伦理能引发战争。谁该为公共利益买单？这考验的不仅仅是你的算术，更是你的道德底线。",
         next: "event8_choice",
     },
 
     event8_choice: {
-        id: "event8_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event8_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（瘟疫逼近，急需修建公共净水井，富商与贫农在税收方案上剑拔弩张）",
         choices: [
             {
@@ -633,12 +633,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event8_ending: {
-        id: "event8_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event8_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "公共产品，是市场永远无法自发提供的东西。",
         next: "event8_ending_2",
     },
     event8_ending_2: {
-        id: "event8_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event8_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "净水、国防、路灯——没有人愿意为自己出钱，却希望别人埋单。这叫【搭便车问题（Free Rider Problem）】。税收，是强制解决这个问题的方式。至于公不公平，每个人心里都有不同的答案。",
         next: "idle_main", 
     },
@@ -646,23 +646,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件九：国际贸易与比较优势 ──────────────────────────────────────────
     event9_start: {
-        id: "event9_start", type: "dialogue", speaker: "铁匠", avatar: "🔨", bg: "village",
+        id: "event9_start", type: "dialogue", speaker: "铁匠", avatar: "/avatar/sad_ironman.png", bg: "village",
         text: "村长！我祖上三代都在这里打铁！你现在要是让那些外村人的便宜铁器进来，我的炉子就得熄火，老婆孩子都要流落街头啊！你忍心看着本村人饿死在外人手里吗？",
         next: "event9_dialogue_2",
     },
     event9_dialogue_2: {
-        id: "event9_dialogue_2", type: "dialogue", speaker: "农民代表", avatar: "🌾", bg: "village",
+        id: "event9_dialogue_2", type: "dialogue", speaker: "农民代表", avatar: "/avatar/angry_farmer.png", bg: "village",
         text: "如果用外村的便宜工具，我们多打的粮食能养活全村双倍的人口！为了保住他一家铁匠铺，让全村人继续用烂锄头受穷挨饿，这公平吗？",
         next: "event9_prophet",
     },
     event9_prophet: {
-        id: "event9_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event9_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "大卫·李嘉图的比较优势（Comparative Advantage）。贸易的确能让整体变得更富裕，但村长，你该如何看着那个即将破产的铁匠的眼睛，亲口告诉他，他就是这个宏大理论的代价？",
         next: "event9_choice",
     },
 
     event9_choice: {
-        id: "event9_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event9_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（邻村愿以廉价铁器换取我村过剩小麦，本地铁匠铺将面临倒闭）",
         choices: [
             {
@@ -696,12 +696,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event9_ending: {
-        id: "event9_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event9_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "贸易让整体更富裕，却不保证每一个个体都受益。",
         next: "event9_ending_2",
     },
     event9_ending_2: {
-        id: "event9_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event9_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "每个村庄都应该专注于自己最擅长的事，然后与他人交换。这叫【比较优势（Comparative Advantage）】。贸易创造财富，但财富的分配，从来都是另一场战争。",
         next: "idle_main", 
     },
@@ -709,23 +709,23 @@ export const NODES: Record<string, Node> = {
 
     // ─── 事件十：汇率战与宏观博弈 ────────────────────────────────────────────
     event10_start: {
-        id: "event10_start", type: "dialogue", speaker: "出口商", avatar: "📦", bg: "village",
+        id: "event10_start", type: "dialogue", speaker: "出口商", avatar: "/avatar/angry_seller.png", bg: "village",
         text: "村长，隔壁村太不要脸了，把他们钱的价值贬得一文不值！咱们的麦子现在在那边卖得比金子还贵，根本没人买！粮仓都要发霉了，我们只能以牙还牙跟着贬值啊！",
         next: "event10_dialogue_2",
     },
     event10_dialogue_2: {
-        id: "event10_dialogue_2", type: "dialogue", speaker: "消费者", avatar: "🧑", bg: "village",
+        id: "event10_dialogue_2", type: "dialogue", speaker: "消费者", avatar: "/avatar/happy_buyer.png", bg: "village",
         text: "别听他的！如果不跟着贬值，虽然麦子卖不出去，但我们拿现在的钱去他们村买东西，简直便宜得像白捡！我才不在乎他的死活，我只关心我手里的钱能买多少肉！",
         next: "event10_prophet",
     },
     event10_prophet: {
-        id: "event10_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event10_prophet", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "当货币脱钩，国家就开始下沉。欢迎来到宏观经济学的终极战场：汇率战。你是选择随波逐流的底线竞争，还是坚守货币的尊严？决定吧，这就是你作为统治者的最后审判。",
         next: "event10_choice",
     },
 
     event10_choice: {
-        id: "event10_choice", type: "choice", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event10_choice", type: "choice", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "（邻村恶意贬值货币，我村小麦出口归零，粮仓滞销，汇率战一触即发）",
         choices: [
             {
@@ -759,12 +759,12 @@ export const NODES: Record<string, Node> = {
     },
 
     event10_ending: {
-        id: "event10_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event10_ending", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "你做出了最后一个决定。",
         next: "event10_ending_2",
     },
     event10_ending_2: {
-        id: "event10_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "village",
+        id: "event10_ending_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "village",
         text: "货币的价值，建立在信任之上。当两个国家互相用贬值来争夺优势，最终两败俱伤。这叫【竞争性贬值（Competitive Devaluation）】——一场没有终点的囚徒困境。",
         next: "epilogue_1", // 👈 只有最终决战事件，才会导向游戏大结局！
     },
@@ -776,32 +776,32 @@ export const NODES: Record<string, Node> = {
         next: "epilogue_2",
     },
     epilogue_2: {
-        id: "epilogue_2", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
+        id: "epilogue_2", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "black",
         text: "你知道吗，我观察过很多村长。有人看见饥荒，第一反应是平均分配；有人看见失业，第一反应是开动印钞机；有人看见垄断，第一反应是让市场自己解决。",
         next: "epilogue_3",
     },
     epilogue_3: {
-        id: "epilogue_3", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
+        id: "epilogue_3", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "black",
         text: "没有一种本能是错的。凯恩斯、哈耶克、马克思——他们都看见了真实的问题，只是开出了不同的药方。而每一剂药，都有它的副作用。",
         next: "epilogue_4",
     },
     epilogue_4: {
-        id: "epilogue_4", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
+        id: "epilogue_4", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "black",
         text: "稀缺性、机会成本、边际效用、外部性、创造性破坏、通胀、垄断、节俭悖论、比较优势、汇率战——你经历的每一件事，都在现实世界中每天上演，规模只是大了几亿倍而已。",
         next: "epilogue_5",
     },
     epilogue_5: {
-        id: "epilogue_5", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
+        id: "epilogue_5", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "black",
         text: "所以，我记下了你的每一个决定。不是为了评判你，而是为了告诉你——你心里，住着一位经济学家。",
         next: "epilogue_6",
     },
     epilogue_6: {
-        id: "epilogue_6", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
+        id: "epilogue_6", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "black",
         text: "也许你是那种相信政府干预能熨平一切波动的宏观架构师。也许你是那种对任何管制都深感厌恶的自由市场信徒。也许你是那种始终把公平置于效率之上的平等守望者。",
         next: "epilogue_7",
     },
     epilogue_7: {
-        id: "epilogue_7", type: "dialogue", speaker: "立（Prophet）", avatar: "🐴", bg: "black",
+        id: "epilogue_7", type: "dialogue", speaker: "立（Prophet）", avatar: "/avatar/prophet.png", bg: "black",
         text: "也许，你只是一个在不同情境下做出不同选择的普通人。而这，才是经济学真正想研究的对象。",
         next: "epilogue_ach",
     },
