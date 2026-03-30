@@ -82,15 +82,15 @@ export function processDailyTick(
     // --- 2. Economy & tax ---
     let baseIncome = (s.population * 5) + (s.marketLevel * 150) + (s.productivity * 3) + (s.mineLevel * 300 * s.techLevel);
 
-    if (s.happiness <= 30) {
+    if (s.happiness <= 20) {
         baseIncome = Math.floor(baseIncome * 0.2);
         s.productivity = Math.max(0, s.productivity - 15);
         summary.messages.push(msg.riotEdge);
-    } else if (s.happiness < 50) {
+    } else if (s.happiness < 40) {
         baseIncome = Math.floor(baseIncome * 0.6);
         s.productivity = Math.max(0, s.productivity - 5);
         summary.messages.push(msg.discontent);
-    } else if (s.happiness > 80) {
+    } else if (s.happiness > 70) {
         baseIncome = Math.floor(baseIncome * 1.3);
     }
 
@@ -98,14 +98,14 @@ export function processDailyTick(
     s.money += summary.income;
 
     // --- 3. Macro linkage ---
-    if (s.gdp > 3000 && s.happiness >= 70 && s.foodStock > s.population * 3) {
+    if (s.gdp > 3000 && s.happiness >= 50 && s.foodStock > s.population * 2) {
         const immigrants = Math.max(1, Math.floor(s.gdp / 2500));
         s.population += immigrants;
         summary.messages.push(msg.immigrants(immigrants));
     }
 
-    if (s.cpi > 150) {
-        s.happiness -= 15;
+    if (s.cpi > 200) {
+        s.happiness -= 10;
         s.productivity -= 10;
         summary.messages.push(msg.hyperinflation);
     } else if (s.cpi > 120) {

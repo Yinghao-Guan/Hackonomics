@@ -20,25 +20,25 @@ type SceneNode = {
 
 const SCRIPT: SceneNode[] = [
   { type: "narration", text: "你在一个陌生的房间醒来，四周一片漆黑...", bg: "black" },
-  { type: "dialogue", speaker: "大妈一", text: "昨天不是还好好的？", avatar: "👵", bg: "black" },
-  { type: "dialogue", speaker: "大妈二", text: "可不是嘛。", avatar: "🧓", bg: "black" },
-  { type: "dialogue", speaker: "大妈三", text: "会不会...脑子坏了？", avatar: "👵", bg: "black" },
-  { type: "narration", text: "（慢慢睁开眼睛，画面亮起，一头驴的大脸出现在你面前）", avatar: "🐴", bg: "room" },
-  { type: "narration", text: "两秒后，他开口说话了。", avatar: "🐴", bg: "room" },
-  { type: "dialogue", speaker: "他", text: "（叹了口气）你终于醒了。", avatar: "🐴", bg: "room" },
+  { type: "dialogue", speaker: "大妈一", text: "昨天不是还好好的？", avatar: "/avatar/old_woman1.png", bg: "black" },
+  { type: "dialogue", speaker: "大妈二", text: "可不是嘛。", avatar: "/avatar/old_woman2.png", bg: "black" },
+  { type: "dialogue", speaker: "大妈三", text: "会不会...脑子坏了？", avatar: "/avatar/old_woman3.png", bg: "black" },
+  { type: "narration", text: "（慢慢睁开眼睛，画面亮起，一头驴的大脸出现在你面前）", avatar: "/avatar/prophet.png", bg: "room" },
+  { type: "narration", text: "两秒后，他开口说话了。", avatar: "/avatar/prophet.png", bg: "room" },
+  { type: "dialogue", speaker: "他", text: "（叹了口气）你终于醒了。", avatar: "/avatar/prophet.png", bg: "room" },
   { type: "narration", text: "（画面继续变暗，你缓缓闭上了眼睛）", bg: "black" },
   { type: "narration", text: "\u201c这是哪里？我是不是吃坏东西了？不对！驴怎么会说话！\u201d", bg: "black" },
-  { type: "narration", text: "（你又睁开了眼睛，那头驴还在静静看着你）", avatar: "🐴", bg: "room" },
-  { type: "choice", choices: ["你..刚刚是说话了？"], avatar: "🐴", bg: "room" },
-  { type: "dialogue", speaker: "你", text: "你..刚刚是说话了？", avatar: "👤", bg: "room" },
-  { type: "dialogue", speaker: "驴", text: "比起这个，你还是关心下自己在哪吧。", avatar: "🐴", bg: "room" },
-  { type: "dialogue", speaker: "大妈一", text: "（小声）他又开始自言自语了。", avatar: "👵", bg: "room" },
-  { type: "dialogue", speaker: "大妈三", text: "我就说吧，脑子坏了。", avatar: "👵", bg: "room" },
-  { type: "dialogue", speaker: "大妈二", text: "那还当不当村长了？", avatar: "🧓", bg: "room" },
-  { type: "choice", choices: ["村长？ 她们....在说什么？"], avatar: "🐴", bg: "room" },
-  { type: "dialogue", speaker: "你", text: "你一愣：\u201c村长？\u201d 你看向驴问：\u201c她们....在说什么？\u201d", avatar: "👤", bg: "room" },
-  { type: "dialogue", speaker: "驴", text: "简单来说，这个村子快撑不下去了，这里的人连最简单的算术都算不明白...", avatar: "🐴", bg: "room" },
-  { type: "dialogue", speaker: "驴", text: "而你这个外来者便成了他们的希望，他们在讨论让你当村长。", avatar: "🐴", bg: "room" },
+  { type: "narration", text: "（你又睁开了眼睛，那头驴还在静静看着你）", avatar: "/avatar/prophet.png", bg: "room" },
+  { type: "choice", choices: ["你..刚刚是说话了？"], avatar: "/avatar/prophet.png", bg: "room" },
+  { type: "dialogue", speaker: "你", text: "你..刚刚是说话了？", bg: "room" },
+  { type: "dialogue", speaker: "驴", text: "比起这个，你还是关心下自己在哪吧。", avatar: "/avatar/prophet.png", bg: "room" },
+  { type: "dialogue", speaker: "大妈一", text: "（小声）他又开始自言自语了。", avatar: "/avatar/old_woman1.png", bg: "room" },
+  { type: "dialogue", speaker: "大妈三", text: "我就说吧，脑子坏了。", avatar: "/avatar/old_woman3.png", bg: "room" },
+  { type: "dialogue", speaker: "大妈二", text: "那还当不当村长了？", avatar: "/avatar/old_woman2.png", bg: "room" },
+  { type: "choice", choices: ["村长？ 她们....在说什么？"], bg: "room" },
+  { type: "dialogue", speaker: "你", text: "你一愣：\u201c村长？\u201d 你看向驴问：\u201c她们....在说什么？\u201d", bg: "room" },
+  { type: "dialogue", speaker: "驴", text: "简单来说，这个村子快撑不下去了，这里的人连最简单的算术都算不明白...", avatar: "/avatar/prophet.png", bg: "room" },
+  { type: "dialogue", speaker: "驴", text: "而你这个外来者便成了他们的希望，他们在讨论让你当村长。", avatar: "/avatar/prophet.png", bg: "room" },
   { type: "achievement", text: "关于我转生后变成村长这件事", description: "在不知情的情况下，接手了一个即将崩溃的微型宏观经济体。", bg: "room" },
   // Index 21: Normal title screen
   { type: "title", bg: "room" },
@@ -58,6 +58,46 @@ const SCRIPT: SceneNode[] = [
   { type: "achievement", text: "平庸之赐 (The Gift of Being Unremarkable)", description: "你放弃了理解与控制世界的权力。在一个由选择构成的世界里，你选择了不再选择。", bg: "wheat" },
   { type: "title_secret", bg: "wheat" },
 ];
+function normalizeLines(text: string | string[]) { return Array.isArray(text) ? text : [text]; }
+
+type GenshinDialogueCardProps = { speaker?: string; lines: string[]; children?: React.ReactNode; isChoice?: boolean; prevNodeText?: string; avatar?: string; };
+function GenshinDialogueCard({ speaker, lines, children, isChoice = false, prevNodeText, avatar }: GenshinDialogueCardProps) {
+    return (
+        <div className="w-full max-w-4xl px-4 pb-8 md:pb-12 animate-[slideUp_0.3s_ease-out]">
+            {speaker && (
+                <div className="relative z-30 inline-block bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2 rounded-t-xl text-black font-bold text-lg md:text-xl shadow-md border border-b-0 border-amber-400/50">
+                    {speaker}
+                </div>
+            )}
+            {/* 对话框主面板 */}
+            <div className="bg-zinc-900/90 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-b-xl rounded-tr-xl min-h-[140px] shadow-2xl relative z-20">
+                
+                {/* 👇 右上方极致透明的头像渲染区域 */}
+                {avatar && (
+                    <div className="absolute -top-20 right-4 md:-top-48 md:right-1 z-20 pointer-events-none drop-shadow-2xl">
+                        <div className="relative w-40 h-40 md:w-64 md:h-64 rounded-full bg-transparent overflow-hidden">
+                            <img 
+                                src={avatar} 
+                                alt={speaker || "Avatar"} 
+                                className="w-full h-full object-cover object-center"
+                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* 文本内容：增加了 pr-24 / md:pr-40 确保文字不会钻到头像下面去 */}
+                {isChoice && prevNodeText && (
+                    <p className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed max-w-[80ch] pr-24 md:pr-40">{prevNodeText}</p>
+                )}
+                {(!isChoice || !prevNodeText) && lines.map((t, i) => (
+                    <p key={i} className="text-lg md:text-xl leading-relaxed text-white/95 animate-vn-text-in max-w-[80ch] pr-24 md:pr-40">{t}</p>
+                ))}
+                {children}
+            </div>
+        </div>
+    );
+}
 
 export default function Home() {
   const [step, setStep] = useState(0);
@@ -136,12 +176,19 @@ export default function Home() {
       >
         {t.langToggle}
       </button>
-
-      {/* Avatar layer */}
-      {currentNode.avatar && currentNode.type !== "title" && currentNode.type !== "title_secret" && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none pb-20">
-          <div className="text-[120px] md:text-[160px] animate-[popIn_0.3s_ease-out,float_4s_ease-in-out_infinite] drop-shadow-2xl">
-            {currentNode.avatar}
+      
+      {currentNode.avatar && currentNode.type === "narration" && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none pb-32">
+          <div className="animate-[popIn_1s_ease-out,float_4s_ease-in-out_infinite] drop-shadow-[0_0_50px_rgba(255,255,255,0.15)]">
+            {(currentNode.avatar.includes('/') || currentNode.avatar.includes('.')) ? (
+              <img 
+                src={currentNode.avatar} 
+                alt="Narration Avatar" 
+                className="w-48 h-48 md:w-80 md:h-80 object-contain opacity-95" 
+              />
+            ) : (
+              <span className="text-[120px] md:text-[160px]">{currentNode.avatar}</span>
+            )}
           </div>
         </div>
       )}
@@ -151,8 +198,8 @@ export default function Home() {
 
         {/* 1. Narration */}
         {currentNode.type === "narration" && (
-          <div className="w-full flex-1 flex items-center justify-center p-8">
-            <p className="text-xl md:text-2xl text-zinc-300 italic text-center leading-relaxed animate-[fadeIn_1.5s_ease-in]">
+          <div className="w-full flex-1 flex items-center justify-center p-8 pointer-events-auto">
+            <p className="text-xl md:text-3xl text-zinc-200 italic text-center leading-relaxed animate-[fadeIn_1.5s_ease-in] drop-shadow-lg max-w-3xl whitespace-pre-wrap">
               {currentNode.text}
             </p>
           </div>
@@ -177,19 +224,15 @@ export default function Home() {
         {/* 3. Dialogue box */}
         {(currentNode.type === "dialogue" || (currentNode.type === "choice" && step > 0 && localizedScript[step - 1].type === "dialogue")) && (
           <div className="w-full max-w-4xl px-4 pb-8 md:pb-12 animate-[slideUp_0.3s_ease-out]">
-            {currentNode.speaker && (
-              <div className="inline-block bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2 rounded-t-xl text-black font-bold text-lg md:text-xl shadow-md border border-b-0 border-amber-400/50">
-                {currentNode.speaker}
-              </div>
-            )}
-            <div className="bg-zinc-900/90 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-b-xl rounded-tr-xl min-h-[140px] shadow-2xl relative">
-              <p className="text-lg md:text-xl text-white/95 leading-relaxed">
-                {currentNode.text || (currentNode.type === "choice" ? localizedScript[step - 1].text : "")}
-              </p>
-              {currentNode.type !== "choice" && (
-                <div className="absolute bottom-4 right-6 text-amber-500 animate-pulse text-2xl">▼</div>
-              )}
-            </div>
+            <GenshinDialogueCard 
+                speaker={currentNode.speaker} 
+                lines={normalizeLines(currentNode.text || (currentNode.type === "choice" ? localizedScript[step - 1].text || "" : ""))} 
+                avatar={currentNode.avatar}
+            >
+                {currentNode.type !== "choice" && (
+                    <button onClick={() => setStep(step + 1)} className="absolute bottom-4 right-6 text-2xl text-amber-500 hover:text-amber-400 animate-pulse cursor-pointer">▼</button>
+                )}
+            </GenshinDialogueCard>
           </div>
         )}
 

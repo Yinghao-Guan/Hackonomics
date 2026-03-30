@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import LogDrawer from "@/components/LogDrawer";
 import AchievementToast from "@/components/AchievementToast";
-import AvatarPlaceholder from "@/components/AvatarPlaceholder";
+// import AvatarPlaceholder from "@/components/AvatarPlaceholder";
 import { NODES, START_NODE_ID, type ChoiceNode, type DialogueNode, type NarrationNode } from "@/lib/nodes";
 import { loadFromStorage, saveToStorage, clearStorage } from "@/lib/storage";
 import { newGameState, clampStats, type GameState } from "@/lib/gameState";
@@ -18,14 +18,44 @@ import type { Effect } from "@/lib/nodes";
 
 function normalizeLines(text: string | string[]) { return Array.isArray(text) ? text : [text]; }
 
-type GenshinDialogueCardProps = { speaker?: string; lines: string[]; children?: React.ReactNode; isChoice?: boolean; prevNodeText?: string; };
-function GenshinDialogueCard({ speaker, lines, children, isChoice = false, prevNodeText }: GenshinDialogueCardProps) {
+type GenshinDialogueCardProps = { speaker?: string; lines: string[]; children?: React.ReactNode; isChoice?: boolean; prevNodeText?: string; avatar?: string; };
+function GenshinDialogueCard({ speaker, lines, children, isChoice = false, prevNodeText, avatar }: GenshinDialogueCardProps) {
+    const isImage = avatar && (avatar.includes('/') || avatar.includes('.'));
     return (
         <div className="w-full max-w-4xl px-4 pb-8 md:pb-12 animate-[slideUp_0.3s_ease-out]">
-            {speaker && <div className="inline-block bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2 rounded-t-xl text-black font-bold text-lg md:text-xl shadow-md border border-b-0 border-amber-400/50">{speaker}</div>}
-            <div className="bg-zinc-900/90 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-b-xl rounded-tr-xl min-h-[140px] shadow-2xl relative">
-                {isChoice && prevNodeText && <p className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed max-w-[80ch]">{prevNodeText}</p>}
-                {(!isChoice || !prevNodeText) && lines.map((t, i) => <p key={i} className="text-lg md:text-xl leading-relaxed text-white/95 animate-vn-text-in max-w-[80ch]">{t}</p>)}
+            {speaker && (
+                <div className="relative z-30 inline-block bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2 rounded-t-xl text-black font-bold text-lg md:text-xl shadow-md border border-b-0 border-amber-400/50">
+                    {speaker}
+                </div>
+            )}
+            {/* 对话框主面板 */}
+            <div className="bg-zinc-900/90 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-b-xl rounded-tr-xl min-h-[140px] shadow-2xl relative z-20">
+                
+                {/* 👇 右上方极致透明的头像渲染区域 */}
+                {avatar && (
+                    <div className="absolute -top-20 right-4 md:-top-48 md:right-1 z-40 pointer-events-none drop-shadow-2xl">
+                        <div className="relative w-40 h-40 md:w-64 md:h-64 rounded-full bg-transparent overflow-hidden flex items-center justify-center text-[80px] md:text-[140px]">
+                            {isImage ? (
+                                <img 
+                                    src={avatar} 
+                                    alt={speaker || "Avatar"} 
+                                    className="w-full h-full object-cover object-center"
+                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                />
+                            ) : (
+                                <span>{avatar}</span>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* 文本内容：增加了 pr-24 / md:pr-40 确保文字不会钻到头像下面去 */}
+                {isChoice && prevNodeText && (
+                    <p className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed max-w-[80ch] pr-24 md:pr-40">{prevNodeText}</p>
+                )}
+                {(!isChoice || !prevNodeText) && lines.map((t, i) => (
+                    <p key={i} className="text-lg md:text-xl leading-relaxed text-white/95 animate-vn-text-in max-w-[80ch] pr-24 md:pr-40">{t}</p>
+                ))}
                 {children}
             </div>
         </div>
@@ -35,7 +65,7 @@ function GenshinDialogueCard({ speaker, lines, children, isChoice = false, prevN
 type GenshinChoiceOverlayProps = { choices: Array<{ key: "A" | "B" | "C"; title: string; description?: string }>; onChoose: (key: "A" | "B" | "C") => void; };
 function GenshinChoiceOverlay({ choices, onChoose }: GenshinChoiceOverlayProps) {
     return (
-        <div className="absolute right-8 md:right-24 top-1/2 -translate-y-1/2 flex flex-col gap-4 w-[80%] max-w-sm z-30 pointer-events-auto">
+        <div className="absolute right-8 md:right-24 top-1/2 -translate-y-1/2 flex flex-col gap-4 w-[80%] max-w-sm z-50 pointer-events-auto">
             {choices.map((c) => (
                 <button key={c.key} onClick={(e) => { e.stopPropagation(); onChoose(c.key); }} className="group relative text-left bg-zinc-900/80 hover:bg-white border border-zinc-600 hover:border-white backdrop-blur-md px-6 py-4 rounded-tl-2xl rounded-bl-2xl rounded-tr-sm rounded-br-2xl shadow-lg transition-all duration-300 animate-[slideInRight_0.4s_ease-out] pointer-events-auto">
                     <div className="flex items-center gap-3">
@@ -156,12 +186,6 @@ function GamePageInner() {
                 isEndingPhase ? "opacity-40" : (node.type === "idle" ? "opacity-0" : "opacity-100")
             }`} />
 
-            {node.type !== "idle" && node.type !== "title_secret" && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pb-[20vh]">
-                    <AvatarPlaceholder label={("speaker" in node && node.speaker) ? (node.speaker as string) : ""} avatar={"avatar" in node ? (node as { avatar?: string }).avatar : undefined} />
-                </div>
-            )}
-
             {node.type !== "title_secret" && (
                 <TopBar stats={state.stats} logOpen={logOpen} onToggleLog={() => setLogOpen((v) => !v)} onNewGame={() => { clearStorage(); router.push("/"); }} onClear={() => { clearStorage(); router.push("/"); }} />
             )}
@@ -187,6 +211,7 @@ function GamePageInner() {
                             lines={normalizeLines((node as unknown as DialogueNode).text)}
                             isChoice={false}
                             prevNodeText={normalizeLines((prevNode as unknown as DialogueNode | null)?.text || "")[0]}
+                            avatar={"avatar" in node ? (node as { avatar?: string }).avatar : undefined}
                         >
                             <button onClick={onContinue} className="absolute bottom-4 right-6 text-2xl text-amber-500 hover:text-amber-400 animate-pulse cursor-pointer">▼</button>
                         </GenshinDialogueCard>
