@@ -393,7 +393,11 @@ export default function EconomicProfile({
                                     {languageLabel}: {languageToggleLabel}
                                 </button>
                                 <button
-                                    onClick={() => { clearStorage(); router.push("/"); }}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        clearStorage();
+                                        router.push("/");
+                                    }}
                                     className={`rounded-[1.25rem] border bg-white/6 px-5 py-4 text-base font-bold transition-transform hover:scale-[1.02] active:scale-[0.98] ${main.edge} ${main.accent}`}
                                 >
                                     {restartLabel}
@@ -450,7 +454,11 @@ export default function EconomicProfile({
 
                     <div className="mt-6 flex justify-center">
                         <button
-                            onClick={() => { clearStorage(); router.push("/"); }}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                clearStorage();
+                                router.push("/");
+                            }}
                             className={`rounded-[1.25rem] border bg-white/6 px-8 py-4 text-base font-bold transition-transform hover:scale-[1.02] active:scale-[0.98] ${main.edge} ${main.accent}`}
                         >
                             {restartLabel}
