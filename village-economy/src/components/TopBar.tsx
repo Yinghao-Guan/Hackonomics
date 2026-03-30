@@ -48,19 +48,19 @@ export default function TopBar({
 
             <div className="ml-auto flex gap-2">
                 <button
-                    onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === "zh" ? "en" : "zh"); }}
                     className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-400 hover:bg-amber-500/20 transition-colors"
                 >
                     {t.langToggle}
                 </button>
                 <button
-                    onClick={onToggleLog}
+                    onClick={(e) => { e.stopPropagation(); onToggleLog(); }}
                     className="rounded-full border border-white/20 bg-black/50 px-3 py-1 text-xs font-medium text-white/80 hover:bg-white/10 transition-colors"
                 >
                     {logOpen ? t.logOpen : t.logClosed}
                 </button>
                 <button
-                    onClick={onNewGame}
+                    onClick={(e) => { e.stopPropagation(); onNewGame(); }}
                     className="rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-colors"
                 >
                     {t.newGame}
