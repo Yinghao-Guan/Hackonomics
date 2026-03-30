@@ -4,7 +4,7 @@
 
 **Village Economy** is an interactive visual novel and economic simulation game built for Hackonomics. You play as a newly reincarnated village chief advised by a talking donkey named Li (Prophet), and face ten sequential economic crises — each built around a real concept from micro and macroeconomics. Every decision is permanent, morally ambiguous, and has cascading effects on your village's GDP, CPI, unemployment, happiness, and population.
 
-The game ends by profiling your economic ideology: are you a Keynesian macro-architect, an Austrian free-market believer, a Marxist equality guardian, or simply a pragmatist? Fully playable in **Chinese (中文)** and **English**.
+The game ends by profiling your economic ideology: are you a **Keynesian Architect**, a **Free Market Libertarian**, an **Iron-Fisted Statist**, or a **Pragmatic Centrist**? Fully playable in **Chinese (中文)** and **English**.
 
 ---
 
@@ -30,8 +30,8 @@ The game ends by profiling your economic ideology: are you a Keynesian macro-arc
 - **10 economic events** spanning opportunity cost, diminishing marginal utility, negative externalities, creative destruction, inflation, monopoly, the paradox of thrift, taxation, comparative advantage, and currency warfare
 - **Real macroeconomics engine** — GDP (expenditure approach), CPI (money-supply/productivity ratio), unemployment (labor market model), and daily ticks with compound interactions
 - **Live villager swarm** — 20 animated NPCs walk, starve, and die based on your stats in real time
-- **30 achievements** — each is a named economic concept with a philosophical commentary
-- **3 possible endings** — a true good ending, two bad endings, and a secret philosophical ending
+- **34 achievements** — 30 choice-based achievements each named after a real economic concept, plus 4 ending achievements
+- **4 possible endings** — a true good ending, two bad endings, and a secret philosophical ending
 - **Bilingual** — full Chinese/English support with a single toggle button; all dialogue, UI, crisis alerts, and daily messages switch instantly
 - **Persistent save** — auto-saves to `localStorage` after every action; resumes exactly where you left off
 
@@ -127,7 +127,7 @@ Click **Clear Memory** on the title screen instead of starting the game. A slow 
 | Fonts | Geist Sans / Geist Mono (Google Fonts) |
 | Runtime | Node.js, React 19 |
 
-No external game engine, no Redux, no animation library — all systems built from scratch in ~1 200 lines of TypeScript.
+No external game engine, no Redux, no animation library — all systems built from scratch in ~4 000 lines of TypeScript.
 
 ---
 
@@ -153,9 +153,12 @@ Hackonomics/
             ├── TopBar.tsx          # HUD stat pills + language toggle + log/new-game buttons
             ├── VillagerSwarm.tsx   # Orchestrates 20 walking NPC actors
             ├── Villager.tsx        # Individual NPC: walks → starves → dies
+            ├── DialogueCard.tsx    # NPC dialogue card with speaker, avatar, and text
+            ├── ChoiceOverlay.tsx   # A/B/C choice selection panel
             ├── LogDrawer.tsx       # Sliding event log timeline
             ├── AchievementToast.tsx# Pop-up notification on achievement unlock
-            └── AvatarPlaceholder.tsx # 140 px emoji portrait + speaker label
+            ├── AvatarPlaceholder.tsx # 140 px emoji portrait + speaker label
+            └── EconomicProfile.tsx # End-game ideology dashboard + full achievement gallery
 ```
 
 ### Core Data Flow
@@ -264,7 +267,9 @@ TopBar stat pills turn red and pulse when:
 
 ## Achievement System
 
-30 unique achievements — one per major choice, plus special unlocks for endings. Each carries a short philosophical commentary connecting your in-game decision to its real-world economic school of thought.
+34 unique achievements — 30 for choices (one per major decision) and 4 for endings. Each carries a short philosophical commentary connecting your in-game decision to its real-world economic school of thought.
+
+### Choice Achievements (30)
 
 | Achievement | English | Concept |
 |---|---|---|
@@ -272,6 +277,7 @@ TopBar stat pills turn red and pulse when:
 | 最优解？ | Optimal Solution? | Utilitarian calculus |
 | 自由 or 逃避 | Freedom or Evasion | Hayekian spontaneous order |
 | 未雨绸缪 | Prepared for the Worst | Keynesian risk management |
+| 效用最大化 | Utility Maximizer | Diminishing marginal utility |
 | 看不见的手 | The Invisible Hand | Austrian market self-order |
 | 铁腕治河 | Iron Fist for the River | Command-and-control regulation |
 | 庇古的算盘 | Pigou's Abacus | Pigouvian taxation |
@@ -297,7 +303,15 @@ TopBar stat pills turn red and pulse when:
 | 以牙还牙 | Tit for Tat | Competitive devaluation |
 | 货币的尊严 | Monetary Dignity | Strong currency policy |
 | 货币同盟 | Monetary Union | Currency union / Eurozone model |
-| 时代的守望者 | The Watcher of Era | True ending — economic pluralism |
+
+### Ending Achievements (4)
+
+| Achievement | English | Unlock Condition |
+|---|---|---|
+| 时代的守望者 | The Watcher of Era | Complete all ten events (true ending) |
+| 死寂之村 | A Ghost Town | Population reaches zero |
+| 独裁者的末日 | The Fall of a Tyrant | Happiness reaches zero |
+| 平庸之赐 | The Gift of Being Unremarkable | Click Clear Memory on the title screen |
 
 ---
 
