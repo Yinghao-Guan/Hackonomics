@@ -370,4 +370,6 @@ The project was built for the Hackonomics hackathon. The codebase is intentional
 
 ## License
 
-MIT
+No open-source license has been attached to this repository at this time.
+
+This project was created by our team for the `Hackonomics` hackathon. All rights are reserved unless we explicitly publish a license later.
