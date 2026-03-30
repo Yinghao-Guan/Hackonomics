@@ -161,6 +161,26 @@ const ALL_ACHIEVEMENTS: AchievementCatalogItem[] = [
     { id: "ach_currency_war", zh: { title: "以牙还牙", description: "出口恢复了，滞销的麦子终于卖出去了。但每个村民口袋里的钱，也悄悄缩水了。竞争性贬值——一场没有赢家的底线竞争。" }, en: ACHIEVEMENT_EN.ach_currency_war },
     { id: "ach_strong_currency", zh: { title: "货币的尊严", description: "出口行业哀鸿遍野，但每一枚铜板的购买力，都坚挺如初。强势货币，是无声的宣言：我们不参与这场竞相堕落的游戏。" }, en: ACHIEVEMENT_EN.ach_strong_currency },
     { id: "ach_monetary_union", zh: { title: "货币同盟", description: "汇率战永久终结，贸易畅通无阻。但代价是，你再也无法用印钞来解决任何国内危机了。权力，有时候需要你亲手交出去，才能换来真正的稳定。" }, en: ACHIEVEMENT_EN.ach_monetary_union },
+    {
+        id: "ending_watcher_of_era",
+        zh: { title: "时代的守望者", description: "你经历了饥荒、通胀、垄断与暴动。你没有逃避，也没有被吞噬。你用权衡与妥协，硬生生地趟出了一条文明的活路。" },
+        en: { title: "The Watcher of Era", description: "You endured famine, inflation, monopoly, and revolt. You were neither consumed nor defeated, and carved a path for civilization through tradeoffs and compromise." },
+    },
+    {
+        id: "ending_ghost_town",
+        zh: { title: "死寂之村", description: "你没有被推翻，也没有被击败。你只是在冰冷的算计中，失去了所有需要你计算的人。" },
+        en: { title: "A Ghost Town", description: "You were not overthrown or defeated. You simply lost everyone for whom you were doing the calculations." },
+    },
+    {
+        id: "ending_fall_of_tyrant",
+        zh: { title: "独裁者的末日", description: "你把效率凌驾于人性之上，最终被忍无可忍的人性反噬。执政者最大的错觉，是以为数字可以替代人心。" },
+        en: { title: "The Fall of a Tyrant", description: "You placed efficiency above humanity and were ultimately devoured by the backlash of people pushed too far." },
+    },
+    {
+        id: "ending_unremarkable",
+        zh: { title: "平庸之赐", description: "你放弃了理解与控制世界的权力。在一个由选择构成的世界里，你选择了不再选择。" },
+        en: { title: "The Gift of Being Unremarkable", description: "You gave up the power to understand and shape the world. In a world built from choices, you chose to stop choosing." },
+    },
 ];
 
 function computeScores(choices: Choices): Record<PersonalityId, number> {
@@ -184,10 +204,14 @@ export default function EconomicProfile({
     choices,
     achievements,
     lang,
+    revealPersonality = true,
+    extraAchievements = [],
 }: {
     choices: Choices;
     achievements: Achievement[];
     lang: Lang;
+    revealPersonality?: boolean;
+    extraAchievements?: Achievement[];
 }) {
     const router = useRouter();
     const { setLang } = useLanguage();
@@ -196,18 +220,32 @@ export default function EconomicProfile({
     const main = PERSONALITIES[dominant];
     const mainText = main[lang];
     const total = Object.values(scores).reduce((sum, value) => sum + value, 0) || 1;
-    const unlockedIds = new Set(achievements.map((achievement) => achievement.id));
+    const mergedAchievements = [...achievements, ...extraAchievements.filter((item) => !achievements.some((base) => base.id === item.id))];
+    const unlockedIds = new Set(mergedAchievements.map((achievement) => achievement.id));
     const unlockedCount = ALL_ACHIEVEMENTS.filter((achievement) => unlockedIds.has(achievement.id)).length;
     const orderedTypes: PersonalityId[] = ["keynesian", "libertarian", "statist", "pragmatist"];
     const secondaryTypes = orderedTypes
         .filter((type) => type !== dominant)
         .sort((left, right) => scores[right] - scores[left]);
+    const unknownCard = {
+        icon: "❖",
+        title: lang === "en" ? "Unknown Profile" : "未知人格",
+        summary: lang === "en"
+            ? "This ending does not grant access to your economic profile."
+            : "这个结局不会向你公开真正的经济人格。",
+        detail: lang === "en"
+            ? "You reached an ending, but the system withholds ideological attribution. The archive of deeds remains, yet the profile itself stays sealed."
+            : "你抵达了一个结局，但系统拒绝给出意识形态归类。成就陈列仍然保留，而人格档案本身依旧封存。",
+        quote: lang === "en" ? "Profile unavailable." : "人格档案不可用。",
+        quoteAuthor: lang === "en" ? "Archive Seal" : "档案封印",
+    };
 
     const titleLabel = lang === "en" ? "Economic Ideology Dashboard" : "经济人格总览";
     const archiveLabel = lang === "en" ? "Hall of Deeds" : "成就展示架";
     const archiveSubLabel = lang === "en" ? "Unlocked relics shine. The rest remain in shadow." : "达成的成就会发光，未达成的仍旧沉在暗处。";
     const progressLabel = lang === "en" ? "Unlocked" : "已点亮";
     const altLabel = lang === "en" ? "Other Leanings" : "其他人格倾向";
+    const hiddenLabel = lang === "en" ? "Sealed Archive" : "封存档案";
     const languageToggleLabel = lang === "en" ? "中文" : "EN";
     const restartLabel = lang === "en" ? "Restart" : "重新开始";
     const languageLabel = lang === "en" ? "Language" : "语言";
@@ -232,53 +270,71 @@ export default function EconomicProfile({
                                 <div className="mb-4 flex items-start justify-between gap-4">
                                     <div>
                                         <div className="mb-2 text-[11px] uppercase tracking-[0.35em] text-amber-100/45">{titleLabel}</div>
-                                        <h1 className={`text-3xl font-black tracking-[0.03em] md:text-5xl ${main.accent}`}>{mainText.name}</h1>
-                                        <p className="mt-2 text-sm text-stone-300/75 md:text-base">{LABEL[dominant][lang]}</p>
+                                        <h1 className={`text-3xl font-black tracking-[0.03em] md:text-5xl ${revealPersonality ? main.accent : "text-stone-100"}`}>
+                                            {revealPersonality ? mainText.name : unknownCard.title}
+                                        </h1>
+                                        <p className="mt-2 text-sm text-stone-300/75 md:text-base">
+                                            {revealPersonality ? LABEL[dominant][lang] : hiddenLabel}
+                                        </p>
                                     </div>
-                                    <div className="animate-[cardFloat_5.5s_ease-in-out_infinite] text-5xl md:text-7xl">{main.icon}</div>
+                                    <div className="animate-[cardFloat_5.5s_ease-in-out_infinite] text-5xl md:text-7xl">
+                                        {revealPersonality ? main.icon : unknownCard.icon}
+                                    </div>
                                 </div>
 
                                 <div className="rounded-[1.5rem] border border-white/10 bg-black/20 p-5 backdrop-blur-sm">
-                                    <p className="text-sm leading-7 text-stone-100/88 md:text-base">{mainText.desc}</p>
+                                    <p className="text-sm leading-7 text-stone-100/88 md:text-base">
+                                        {revealPersonality ? mainText.desc : unknownCard.detail}
+                                    </p>
                                     <div className="mt-5 border-t border-amber-100/10 pt-4">
-                                        <p className={`text-sm italic md:text-base ${main.accent}`}>&ldquo;{mainText.quote}&rdquo;</p>
-                                        <p className="mt-2 text-right text-xs tracking-[0.2em] text-stone-400 uppercase">{mainText.quoteAuthor}</p>
+                                        <p className={`text-sm italic md:text-base ${revealPersonality ? main.accent : "text-stone-200"}`}>
+                                            &ldquo;{revealPersonality ? mainText.quote : unknownCard.quote}&rdquo;
+                                        </p>
+                                        <p className="mt-2 text-right text-xs tracking-[0.2em] text-stone-400 uppercase">
+                                            {revealPersonality ? mainText.quoteAuthor : unknownCard.quoteAuthor}
+                                        </p>
                                     </div>
                                 </div>
 
-                                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                    {orderedTypes.map((type) => {
-                                        const pct = Math.round((scores[type] / total) * 100);
-                                        const personality = PERSONALITIES[type];
-                                        return (
-                                            <div
-                                                key={type}
-                                                className={`rounded-2xl border px-4 py-3 ${type === dominant ? `${personality.edge} bg-white/8` : "border-white/8 bg-white/4"}`}
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <span className={`text-sm font-semibold ${type === dominant ? personality.accent : "text-stone-200/75"}`}>
-                                                        {LABEL[type][lang]}
-                                                    </span>
-                                                    <span className={`text-xs ${type === dominant ? personality.accent : "text-stone-400"}`}>{pct}%</span>
+                                {revealPersonality ? (
+                                    <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                        {orderedTypes.map((type) => {
+                                            const pct = Math.round((scores[type] / total) * 100);
+                                            const personality = PERSONALITIES[type];
+                                            return (
+                                                <div
+                                                    key={type}
+                                                    className={`rounded-2xl border px-4 py-3 ${type === dominant ? `${personality.edge} bg-white/8` : "border-white/8 bg-white/4"}`}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <span className={`text-sm font-semibold ${type === dominant ? personality.accent : "text-stone-200/75"}`}>
+                                                            {LABEL[type][lang]}
+                                                        </span>
+                                                        <span className={`text-xs ${type === dominant ? personality.accent : "text-stone-400"}`}>{pct}%</span>
+                                                    </div>
+                                                    <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+                                                        <div
+                                                            className={`h-full rounded-full ${type === dominant ? "bg-current opacity-100" : "bg-white/35 opacity-60"} ${personality.accent}`}
+                                                            style={{ width: `${pct}%` }}
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
-                                                    <div
-                                                        className={`h-full rounded-full ${type === dominant ? "bg-current opacity-100" : "bg-white/35 opacity-60"} ${personality.accent}`}
-                                                        style={{ width: `${pct}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="mt-5 rounded-[1.5rem] border border-white/8 bg-white/4 p-5">
+                                        <div className="text-sm leading-7 text-stone-200/80">{unknownCard.summary}</div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-4">
                             <div className="rounded-[1.75rem] border border-amber-100/15 bg-[linear-gradient(180deg,rgba(64,45,26,0.35),rgba(18,13,10,0.82))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.25)]">
-                                <div className="text-[11px] uppercase tracking-[0.28em] text-amber-100/40">{altLabel}</div>
+                                <div className="text-[11px] uppercase tracking-[0.28em] text-amber-100/40">{revealPersonality ? altLabel : hiddenLabel}</div>
                                 <div className="mt-4 space-y-3">
-                                    {secondaryTypes.map((type, index) => {
+                                    {revealPersonality ? secondaryTypes.map((type, index) => {
                                         const personality = PERSONALITIES[type];
                                         const text = personality[lang];
                                         return (
@@ -296,7 +352,21 @@ export default function EconomicProfile({
                                                 </div>
                                             </div>
                                         );
-                                    })}
+                                    }) : Array.from({ length: 3 }).map((_, index) => (
+                                        <div
+                                            key={index}
+                                            className="rounded-2xl border border-white/8 bg-black/18 p-4"
+                                            style={{ animation: `fadeIn 0.45s ease-out ${0.12 * (index + 1)}s both` }}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="text-2xl text-stone-500">?</div>
+                                                <div>
+                                                    <div className="text-sm font-semibold text-stone-300">{lang === "en" ? "Unknown" : "未知"}</div>
+                                                    <div className="mt-1 text-xs leading-5 text-stone-400">{lang === "en" ? "Classification withheld." : "分类结果已封存。"}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
@@ -308,7 +378,9 @@ export default function EconomicProfile({
                                     </div>
                                     <div className="text-right text-xs text-stone-400">
                                         <div>{mainProfileLabel}</div>
-                                        <div className={`mt-1 font-semibold ${main.accent}`}>{mainText.name}</div>
+                                        <div className={`mt-1 font-semibold ${revealPersonality ? main.accent : "text-stone-200"}`}>
+                                            {revealPersonality ? mainText.name : unknownCard.title}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -347,7 +419,7 @@ export default function EconomicProfile({
                             {ALL_ACHIEVEMENTS.map((achievement, index) => {
                                 const unlocked = unlockedIds.has(achievement.id);
                                 const display = lang === "en" ? achievement.en : achievement.zh;
-                                const unlockedSource = achievements.find((item) => item.id === achievement.id);
+                                const unlockedSource = mergedAchievements.find((item) => item.id === achievement.id);
                                 const localizedUnlocked = unlockedSource ? localizeAchievement(unlockedSource, lang) : null;
                                 const title = localizedUnlocked?.title ?? display.title;
                                 const description = localizedUnlocked?.description ?? display.description;

@@ -1,5 +1,3 @@
-import { Achievement } from "./gameState";
-
 // src/lib/nodes.ts
 export type ChoiceKey = "A" | "B" | "C";
 
@@ -830,7 +828,8 @@ export const NODES: Record<string, Node> = {
     // 👇 成就浮现
     bad_ending_starved_ach: { id: "bad_ending_starved_ach", type: "achievement", bg: "ruins", text: "死寂之村 (A Ghost Town)", description: "你没有被推翻，也没有被击败。你只是在冰冷的算计中，失去了所有需要你计算的人。", next: "bad_ending_starved_title" },
     // 👇 背景化为纯黑
-    bad_ending_starved_title: { id: "bad_ending_starved_title", type: "title_secret", bg: "black", speaker: "【坏结局：死寂之村】", text: "A Ghost Town." },
+    bad_ending_starved_title: { id: "bad_ending_starved_title", type: "title_secret", bg: "black", speaker: "【坏结局：死寂之村】", text: "A Ghost Town.", next: "bad_ending_starved_profile" },
+    bad_ending_starved_profile: { id: "bad_ending_starved_profile", type: "profile", bg: "black", next: "bad_ending_starved_profile" },
 
     // ─── 💀 坏结局 2：幸福度归零被推翻 ──────────────
     bad_ending_exiled: { id: "bad_ending_exiled", type: "narration", bg: "black", autoPlayDuration: 4000, text: "听到了吗？门外那些愤怒的火把和草叉。", next: "bad_ending_exiled_2" },
@@ -838,5 +837,6 @@ export const NODES: Record<string, Node> = {
     // 👇 背景烈火亮起，暂停等待点击
     bad_ending_exiled_3: { id: "bad_ending_exiled_3", type: "narration", bg: "fire", autoPlayDuration: 4000, text: "他们没收了你的财产，剥夺了你的权力，将你永远流放进了暴风雪中。", next: "bad_ending_exiled_ach" },
     bad_ending_exiled_ach: { id: "bad_ending_exiled_ach", type: "achievement", bg: "fire", text: "独裁者的末日 (The Fall of a Tyrant)", description: "你把效率凌驾于人性之上，最终被忍无可忍的人性反噬。执政者最大的错觉，是以为数字可以替代人心。", next: "bad_ending_exiled_title" },
-    bad_ending_exiled_title: { id: "bad_ending_exiled_title", type: "title_secret", bg: "black", speaker: "【坏结局：独裁者的末日】", text: "The Fall of a Tyrant." },
+    bad_ending_exiled_title: { id: "bad_ending_exiled_title", type: "title_secret", bg: "black", speaker: "【坏结局：独裁者的末日】", text: "The Fall of a Tyrant.", next: "bad_ending_exiled_profile" },
+    bad_ending_exiled_profile: { id: "bad_ending_exiled_profile", type: "profile", bg: "black", next: "bad_ending_exiled_profile" },
 };

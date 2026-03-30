@@ -686,6 +686,22 @@ export const ACHIEVEMENT_EN: Record<string, { title: string; description: string
         title: "Monetary Union",
         description: "The currency war is permanently ended, trade flows freely. But the cost is, you can no longer use money printing to solve any domestic crisis. Power sometimes requires you to hand it over yourself to achieve true stability.",
     },
+    ending_watcher_of_era: {
+        title: "The Watcher of Era",
+        description: "You endured famine, inflation, monopoly, and revolt. You were neither consumed nor defeated, and carved a path for civilization through tradeoffs and compromise.",
+    },
+    ending_ghost_town: {
+        title: "A Ghost Town",
+        description: "You were not overthrown or defeated. You simply lost everyone for whom you were doing the calculations.",
+    },
+    ending_fall_of_tyrant: {
+        title: "The Fall of a Tyrant",
+        description: "You placed efficiency above humanity and were ultimately devoured by the backlash of people pushed too far.",
+    },
+    ending_unremarkable: {
+        title: "The Gift of Being Unremarkable",
+        description: "You gave up the power to understand and shape the world. In a world built from choices, you chose to stop choosing.",
+    },
 };
 
 // ─── Crisis Translations (English) ───────────────────────────────────────────

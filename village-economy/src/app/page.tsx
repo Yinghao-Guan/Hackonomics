@@ -4,11 +4,13 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import VillagerSwarm from "@/components/VillagerSwarm";
+import EconomicProfile from "@/components/EconomicProfile";
+import type { Achievement } from "@/lib/gameState";
 import { useLanguage } from "@/lib/language";
 import { UI, SCRIPT_TEXT_EN } from "@/lib/translations";
 
 type SceneNode = {
-  type: "narration" | "dialogue" | "choice" | "achievement" | "title" | "title_secret";
+  type: "narration" | "dialogue" | "choice" | "achievement" | "title" | "title_secret" | "profile";
   speaker?: string;
   text?: string;
   description?: string;
@@ -57,6 +59,7 @@ const SCRIPT: SceneNode[] = [
   { type: "narration", text: "而你，选择了一种不需要被证明的生活。", bg: "wheat", autoPlayDuration: 5500 },
   { type: "achievement", text: "平庸之赐 (The Gift of Being Unremarkable)", description: "你放弃了理解与控制世界的权力。在一个由选择构成的世界里，你选择了不再选择。", bg: "wheat" },
   { type: "title_secret", bg: "wheat" },
+  { type: "profile", bg: "wheat" },
 ];
 function normalizeLines(text: string | string[]) { return Array.isArray(text) ? text : [text]; }
 
@@ -116,6 +119,14 @@ export default function Home() {
 
   const currentNode = localizedScript[step];
   const isFinished = step >= localizedScript.length - 1;
+  const hiddenEndingAchievement: Achievement[] = [
+    {
+      id: "ending_unremarkable",
+      title: "平庸之赐",
+      description: "你放弃了理解与控制世界的权力。在一个由选择构成的世界里，你选择了不再选择。",
+      unlockedAt: 0,
+    },
+  ];
 
   useEffect(() => {
     if (currentNode.autoPlayDuration) {
@@ -128,7 +139,7 @@ export default function Home() {
 
   const handleScreenClick = () => {
     if (isFinished) return;
-    if (currentNode.type === "choice" || currentNode.type === "title" || currentNode.type === "title_secret") return;
+    if (currentNode.type === "choice" || currentNode.type === "title" || currentNode.type === "title_secret" || currentNode.type === "profile") return;
     if (currentNode.autoPlayDuration) return;
     setStep(step + 1);
   };
@@ -139,12 +150,6 @@ export default function Home() {
     e.stopPropagation();
     localStorage.removeItem("village_economy_save_v1");
     setStep(step + 1);
-  };
-
-  const handleRestart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    localStorage.removeItem("village_economy_save_v1");
-    setStep(0);
   };
 
   const getBackgroundImage = () => {
@@ -296,12 +301,22 @@ export default function Home() {
               {currentNode.text || "Ignorance is Bliss."}
             </p>
             <button
-              onClick={handleRestart}
+              onClick={(e) => { e.stopPropagation(); setStep(step + 1); }}
               className="group relative overflow-hidden rounded-xl border border-white/20 bg-black/60 backdrop-blur-md px-10 py-4 text-lg font-medium text-white/80 transition-all hover:bg-white/20 hover:text-white cursor-pointer"
             >
-              <span className="relative z-10">{t.restart}</span>
+              <span className="relative z-10">{lang === "en" ? "View Profile" : "查看人格档案"}</span>
             </button>
           </div>
+        )}
+
+        {currentNode.type === "profile" && (
+          <EconomicProfile
+            choices={{}}
+            achievements={[]}
+            lang={lang}
+            revealPersonality={false}
+            extraAchievements={hiddenEndingAchievement}
+          />
         )}
       </div>
 

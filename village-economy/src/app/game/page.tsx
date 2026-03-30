@@ -10,7 +10,7 @@ import AchievementToast from "@/components/AchievementToast";
 import { NODES, START_NODE_ID, type ChoiceNode, type DialogueNode, type NarrationNode } from "@/lib/nodes";
 import EconomicProfile from "@/components/EconomicProfile";
 import { loadFromStorage, saveToStorage, clearStorage } from "@/lib/storage";
-import { newGameState, clampStats, type GameState } from "@/lib/gameState";
+import { newGameState, clampStats, type Achievement, type GameState } from "@/lib/gameState";
 import { applyEffects, type DailySummary, type CrisisAlert } from "@/lib/engine";
 import VillagerSwarm from "@/components/VillagerSwarm";
 import { useLanguage } from "@/lib/language";
@@ -129,6 +129,33 @@ function GamePageInner() {
         if (!toastAchId) return null;
         return state.achievements.find((a) => a.id === toastAchId) ?? null;
     }, [toastAchId, state.achievements]);
+
+    const profileExtraAchievements: Record<string, Achievement[]> = {
+        epilogue_profile: [
+            {
+                id: "ending_watcher_of_era",
+                title: "时代的守望者",
+                description: "你经历了饥荒、通胀、垄断与暴动。你没有逃避，也没有被吞噬。你用权衡与妥协，硬生生地趟出了一条文明的活路。",
+                unlockedAt: 0,
+            },
+        ],
+        bad_ending_starved_profile: [
+            {
+                id: "ending_ghost_town",
+                title: "死寂之村",
+                description: "你没有被推翻，也没有被击败。你只是在冰冷的算计中，失去了所有需要你计算的人。",
+                unlockedAt: 0,
+            },
+        ],
+        bad_ending_exiled_profile: [
+            {
+                id: "ending_fall_of_tyrant",
+                title: "独裁者的末日",
+                description: "你把效率凌驾于人性之上，最终被忍无可忍的人性反噬。执政者最大的错觉，是以为数字可以替代人心。",
+                unlockedAt: 0,
+            },
+        ],
+    };
 
     if (!node) return <div className="text-white text-center mt-20">{t.nodeError}</div>;
 
@@ -476,6 +503,8 @@ function GamePageInner() {
                     choices={state.choices}
                     achievements={state.achievements}
                     lang={lang}
+                    revealPersonality={node.id === "epilogue_profile"}
+                    extraAchievements={profileExtraAchievements[node.id] ?? []}
                 />
             )}
             <LogDrawer open={logOpen} log={state.log} />
