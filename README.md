@@ -6,6 +6,8 @@
 
 The game ends by profiling your economic ideology: are you a **Keynesian Architect**, a **Free Market Libertarian**, an **Iron-Fisted Statist**, or a **Pragmatic Centrist**? Fully playable in **Chinese (中文)** and **English**.
 
+Live demo: [https://hackonomics.vercel.app/](https://hackonomics.vercel.app/)
+
 ---
 
 ## Table of Contents
