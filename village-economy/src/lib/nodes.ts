@@ -89,6 +89,13 @@ export type NarrationNode = {
     next: string; 
 };
 
+export type ProfileNode = {
+    id: string;
+    type: "profile";
+    bg?: BgType;
+    next: string;
+};
+
 export type Node = DialogueNode | ChoiceNode | IdleNode | TitleSecretNode | AchievementNode | NarrationNode | ProfileNode;
 
 export const START_NODE_ID = "event1_start";
