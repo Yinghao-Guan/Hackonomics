@@ -466,43 +466,47 @@ function GamePageInner() {
 
             {/* Daily Summary Overlay */}
             {dailySummary && !crisisAlert && (
-                <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-                    <div className="bg-zinc-900 border border-white/20 p-8 rounded-3xl w-96 shadow-2xl animate-[slideUp_0.4s_ease-out]">
-                        <h2 className="text-2xl font-bold text-center text-white mb-6 border-b border-white/10 pb-4">
+                <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
+                    <div className="flex max-h-[min(90vh,56rem)] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-white/20 bg-zinc-900 shadow-2xl animate-[slideUp_0.4s_ease-out]">
+                        <h2 className="shrink-0 border-b border-white/10 px-6 py-5 text-center text-xl font-bold text-white sm:px-8 sm:text-2xl">
                             {t.summaryTitle(dailySummary.day)}
                         </h2>
-                        <div className="space-y-4 text-lg">
-                            <div className="flex justify-between text-green-400"><span>{t.summaryRevenue}</span><span>+¥{dailySummary.income}</span></div>
-                            <div className="flex justify-between text-amber-400"><span>{t.summaryFoodProd}</span><span>+{dailySummary.foodProd} kg</span></div>
-                            <div className="flex justify-between text-red-400"><span>{t.summaryFoodCons}</span><span>-{dailySummary.foodCons} kg</span></div>
+                        <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 sm:py-6">
+                            <div className="space-y-4 text-base sm:text-lg">
+                                <div className="flex items-start justify-between gap-4 text-green-400"><span className="min-w-0 break-words">{t.summaryRevenue}</span><span className="shrink-0 text-right">+¥{dailySummary.income}</span></div>
+                                <div className="flex items-start justify-between gap-4 text-amber-400"><span className="min-w-0 break-words">{t.summaryFoodProd}</span><span className="shrink-0 text-right">+{dailySummary.foodProd} kg</span></div>
+                                <div className="flex items-start justify-between gap-4 text-red-400"><span className="min-w-0 break-words">{t.summaryFoodCons}</span><span className="shrink-0 text-right">-{dailySummary.foodCons} kg</span></div>
 
-                            {dailySummary.starved > 0 && (
-                                <div className="text-center bg-red-500/20 text-red-400 p-2 rounded-lg font-bold animate-pulse mt-4">
-                                    {t.summaryStarved(dailySummary.starved)}
+                                {dailySummary.starved > 0 && (
+                                    <div className="mt-4 rounded-lg bg-red-500/20 p-2 text-center font-bold text-red-400 animate-pulse">
+                                        {t.summaryStarved(dailySummary.starved)}
+                                    </div>
+                                )}
+
+                                <div className="mt-4 space-y-2 rounded-xl border-t border-white/10 bg-black/40 p-4 pt-4 text-sm shadow-inner font-mono">
+                                    <div className="mb-2 text-center text-xs font-bold tracking-widest text-zinc-500">{t.macroTitle}</div>
+                                    <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-1 text-white"><span className="min-w-0 break-words">{t.macroPopulation}</span><span className="shrink-0 text-right">{dailySummary.macro.population}</span></div>
+                                    <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-1 text-white"><span className="min-w-0 break-words">{t.macroGdp}</span><span className="shrink-0 text-right text-yellow-400">¥{dailySummary.macro.gdp}</span></div>
+                                    <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-1 text-white"><span className="min-w-0 break-words">{t.macroHappiness}</span><span className={`shrink-0 text-right ${dailySummary.macro.happiness < 40 ? "font-bold text-red-400" : "text-green-400"}`}>{dailySummary.macro.happiness} / 100</span></div>
+                                    <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-1 text-white"><span className="min-w-0 break-words">{t.macroProductivity}</span><span className={`shrink-0 text-right ${dailySummary.macro.productivity < 80 ? "font-bold text-red-400" : "text-blue-400"}`}>{dailySummary.macro.productivity}</span></div>
+                                    <div className="flex items-start justify-between gap-4 border-b border-white/5 pb-1 text-white"><span className="min-w-0 break-words">{t.macroCpi}</span><span className={`shrink-0 text-right ${dailySummary.macro.cpi > 120 ? "font-bold text-red-400" : ""}`}>{dailySummary.macro.cpi}</span></div>
+                                    <div className="flex items-start justify-between gap-4 pb-1 text-white"><span className="min-w-0 break-words">{t.macroUnemployment}</span><span className={`shrink-0 text-right ${dailySummary.macro.unemploymentRate > 20 ? "font-bold text-red-400" : ""}`}>{dailySummary.macro.unemploymentRate}%</span></div>
                                 </div>
-                            )}
 
-                            <div className="border-t border-white/10 pt-4 mt-4 space-y-2 text-sm font-mono bg-black/40 p-4 rounded-xl shadow-inner">
-                                <div className="text-zinc-500 mb-2 text-xs font-bold tracking-widest text-center">{t.macroTitle}</div>
-                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>{t.macroPopulation}</span><span>{dailySummary.macro.population}</span></div>
-                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>{t.macroGdp}</span><span className="text-yellow-400">¥{dailySummary.macro.gdp}</span></div>
-                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>{t.macroHappiness}</span><span className={dailySummary.macro.happiness < 40 ? "text-red-400 font-bold" : "text-green-400"}>{dailySummary.macro.happiness} / 100</span></div>
-                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>{t.macroProductivity}</span><span className={dailySummary.macro.productivity < 80 ? "text-red-400 font-bold" : "text-blue-400"}>{dailySummary.macro.productivity}</span></div>
-                                <div className="flex justify-between text-white border-b border-white/5 pb-1"><span>{t.macroCpi}</span><span className={dailySummary.macro.cpi > 120 ? "text-red-400 font-bold" : ""}>{dailySummary.macro.cpi}</span></div>
-                                <div className="flex justify-between text-white pb-1"><span>{t.macroUnemployment}</span><span className={dailySummary.macro.unemploymentRate > 20 ? "text-red-400 font-bold" : ""}>{dailySummary.macro.unemploymentRate}%</span></div>
+                                {dailySummary.messages.length > 0 && (
+                                    <div className="pt-2">
+                                        {dailySummary.messages.map((m, i) => (
+                                            <div key={i} className="mt-1 text-center text-sm font-bold leading-relaxed text-amber-500 break-words">{m}</div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-
-                            {dailySummary.messages.length > 0 && (
-                                <div className="pt-2">
-                                    {dailySummary.messages.map((m, i) => (
-                                        <div key={i} className="text-sm text-amber-500 mt-1 text-center leading-relaxed font-bold">{m}</div>
-                                    ))}
-                                </div>
-                            )}
                         </div>
-                        <button onClick={() => setDailySummary(null)} className="mt-8 w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-gray-200 transition-all">
+                        <div className="shrink-0 border-t border-white/10 px-6 py-4 sm:px-8">
+                            <button onClick={() => setDailySummary(null)} className="w-full rounded-xl bg-white py-3 font-bold text-black transition-all hover:bg-gray-200">
                             {t.summaryConfirm}
-                        </button>
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
