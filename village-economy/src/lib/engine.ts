@@ -3,7 +3,7 @@ import type { Effect, GameStats } from "./nodes";
 import type { GameState } from "./gameState";
 import { clampStats } from "./gameState";
 import type { Lang } from "./translations";
-import { ENGINE_MSG, CRISIS_EN } from "./translations";
+import { ENGINE_MSG, CRISIS_EN, ACHIEVEMENT_EN } from "./translations";
 
 export type DailySummary = {
     day: number; foodProd: number; foodCons: number; starved: number; income: number; messages: string[];
@@ -34,10 +34,11 @@ function makeCrisis(
     key: keyof typeof CRISIS_ZH,
     eventId: string,
     shockEffects: Effect[],
-    lang: Lang
+    lang: Lang,
+    translationKey?: string
 ): CrisisAlert {
     const zh = CRISIS_ZH[key];
-    const en = CRISIS_EN[eventId];
+    const en = CRISIS_EN[translationKey ?? eventId];
     const { title, description } = lang === "en" && en ? en : zh;
     return { eventId, title, description, shockEffects };
 }
@@ -48,13 +49,15 @@ export function processDailyTick(
 ): { state: GameState; summary: DailySummary; crisis: CrisisAlert | null } {
     let next = structuredClone(state);
     let s = next.stats;
-    const msg = ENGINE_MSG[lang];
+    const msgZh = ENGINE_MSG.zh;
+    const msgEn = ENGINE_MSG.en;
+    const zhMessages: string[] = [];
+    const enMessages: string[] = [];
     let summary: DailySummary = {
         day: s.day, foodProd: 0, foodCons: 0, starved: 0, income: 0, messages: [],
         macro: { population: 0, happiness: 0, productivity: 0, cpi: 0, unemploymentRate: 0, gdp: 0 },
     };
 
-    // --- 1. Agriculture & survival ---
     const baseForaging = Math.floor(s.population * 0.4);
     const prodMultiplier = Math.max(0.1, s.productivity / 100);
     const farmingOutput = Math.floor(((s.farmLevel * 8) + (s.pastureLevel * 4)) * prodMultiplier);
@@ -70,26 +73,29 @@ export function processDailyTick(
             s.population -= summary.starved;
             s.happiness -= 10;
             s.productivity -= summary.starved * 5;
-            summary.messages.push(msg.famineSpread(summary.starved));
+            zhMessages.push(msgZh.famineSpread(summary.starved));
+            enMessages.push(msgEn.famineSpread(summary.starved));
         } else {
-            summary.messages.push(msg.foodShortage);
+            zhMessages.push(msgZh.foodShortage);
+            enMessages.push(msgEn.foodShortage);
             s.productivity -= 5;
             s.happiness -= 5;
         }
         s.foodStock = 0;
     }
 
-    // --- 2. Economy & tax ---
     let baseIncome = (s.population * 5) + (s.marketLevel * 150) + (s.productivity * 3) + (s.mineLevel * 300 * s.techLevel);
 
     if (s.happiness <= 30) {
         baseIncome = Math.floor(baseIncome * 0.2);
         s.productivity = Math.max(0, s.productivity - 15);
-        summary.messages.push(msg.riotEdge);
+        zhMessages.push(msgZh.riotEdge);
+        enMessages.push(msgEn.riotEdge);
     } else if (s.happiness < 50) {
         baseIncome = Math.floor(baseIncome * 0.6);
         s.productivity = Math.max(0, s.productivity - 5);
-        summary.messages.push(msg.discontent);
+        zhMessages.push(msgZh.discontent);
+        enMessages.push(msgEn.discontent);
     } else if (s.happiness > 80) {
         baseIncome = Math.floor(baseIncome * 1.3);
     }
@@ -97,31 +103,37 @@ export function processDailyTick(
     summary.income = Math.floor(baseIncome);
     s.money += summary.income;
 
-    // --- 3. Macro linkage ---
     if (s.gdp > 3000 && s.happiness >= 70 && s.foodStock > s.population * 3) {
         const immigrants = Math.max(1, Math.floor(s.gdp / 2500));
         s.population += immigrants;
-        summary.messages.push(msg.immigrants(immigrants));
+        zhMessages.push(msgZh.immigrants(immigrants));
+        enMessages.push(msgEn.immigrants(immigrants));
     }
 
     if (s.cpi > 150) {
         s.happiness -= 15;
         s.productivity -= 10;
-        summary.messages.push(msg.hyperinflation);
+        zhMessages.push(msgZh.hyperinflation);
+        enMessages.push(msgEn.hyperinflation);
     } else if (s.cpi > 120) {
         s.happiness -= 5;
-        summary.messages.push(msg.priceSurge);
+        zhMessages.push(msgZh.priceSurge);
+        enMessages.push(msgEn.priceSurge);
     }
 
     if (s.unemploymentRate > 30) {
         s.happiness -= 10;
-        summary.messages.push(msg.unemployment);
+        zhMessages.push(msgZh.unemployment);
+        enMessages.push(msgEn.unemployment);
     }
 
     if (s.foodStock > s.population * 2 && s.unemploymentRate <= 15 && s.cpi <= 120 && s.happiness < 90) {
         s.happiness += 2;
-        summary.messages.push(msg.stability);
+        zhMessages.push(msgZh.stability);
+        enMessages.push(msgEn.stability);
     }
+
+    summary.messages = lang === "en" ? enMessages : zhMessages;
 
     s.actionPoints = 3;
     s.day += 1;
@@ -130,9 +142,11 @@ export function processDailyTick(
     next.stats = recalculateMacroEconomics(next.stats);
     next.stats = clampStats(next.stats);
 
-    let logText = msg.dailyLog(summary.day, summary.foodProd, summary.foodCons, summary.income);
-    if (summary.messages.length > 0) logText += ` | ${summary.messages.join(" ")}`;
-    next.log.unshift({ ts: Date.now(), text: logText });
+    let logZh = msgZh.dailyLog(summary.day, summary.foodProd, summary.foodCons, summary.income);
+    let logEn = msgEn.dailyLog(summary.day, summary.foodProd, summary.foodCons, summary.income);
+    if (zhMessages.length > 0) logZh += ` | ${zhMessages.join(" ")}`;
+    if (enMessages.length > 0) logEn += ` | ${enMessages.join(" ")}`;
+    next.log.unshift({ ts: Date.now(), zh: logZh, en: logEn });
 
     let crisis: CrisisAlert | null = null;
     const h = next.completedEvents || [];
@@ -147,7 +161,7 @@ export function processDailyTick(
             { type: "add", key: "money", value: -1000 },
             { type: "set", key: "marketLevel", value: 0 },
             { type: "add", key: "population", value: -3 },
-        ], lang);
+        ], lang, "event_riot");
         next.completedEvents.push("event_riot");
     } else {
         if (next.stats.pastureLevel > 0 && !isDone("event2_start")) {
@@ -224,19 +238,21 @@ function recalculateMacroEconomics(stats: GameStats): GameStats {
 export function applyEffects(state: GameState, effects: Effect[], lang: Lang = "zh"): { state: GameState; lastAchievementId?: string } {
     let next: GameState = structuredClone(state);
     let lastAchievementId: string | undefined;
-    const msg = ENGINE_MSG[lang];
+    const msgZh = ENGINE_MSG.zh;
+    const msgEn = ENGINE_MSG.en;
 
     for (const e of effects) {
         switch (e.type) {
             case "add": next.stats[e.key] = (next.stats[e.key] as number) + e.value; break;
             case "set": next.stats[e.key] = e.value; break;
-            case "log": next.log.unshift({ ts: Date.now(), text: e.text }); break;
+            case "log": next.log.unshift({ ts: Date.now(), zh: e.zh, en: e.en }); break;
             case "achievement": {
                 const exists = next.achievements.some((a) => a.id === e.id);
                 if (!exists) {
                     next.achievements.unshift({ id: e.id, title: e.title, description: e.description, unlockedAt: Date.now() });
                     lastAchievementId = e.id;
-                    next.log.unshift({ ts: Date.now(), text: msg.achievementLog(e.title) });
+                    const enTitle = ACHIEVEMENT_EN[e.id]?.title ?? e.title;
+                    next.log.unshift({ ts: Date.now(), zh: msgZh.achievementLog(e.title), en: msgEn.achievementLog(enTitle) });
                 }
                 break;
             }
