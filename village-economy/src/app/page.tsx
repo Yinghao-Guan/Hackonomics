@@ -6,6 +6,7 @@ import Link from "next/link";
 import VillagerSwarm from "@/components/VillagerSwarm";
 import EconomicProfile from "@/components/EconomicProfile";
 import type { Achievement } from "@/lib/gameState";
+import { loadPermanentAchievements, savePermanentAchievements } from "@/lib/storage";
 import { useLanguage } from "@/lib/language";
 import { UI, SCRIPT_TEXT_EN } from "@/lib/translations";
 
@@ -18,6 +19,13 @@ type SceneNode = {
   bg: "black" | "room" | "wheat";
   choices?: string[];
   autoPlayDuration?: number;
+};
+
+const HIDDEN_ENDING_ACHIEVEMENT: Achievement = {
+  id: "ending_unremarkable",
+  title: "平庸之赐",
+  description: "你放弃了理解与控制世界的权力。在一个由选择构成的世界里，你选择了不再选择。",
+  unlockedAt: 0,
 };
 
 const SCRIPT: SceneNode[] = [
@@ -104,6 +112,7 @@ function GenshinDialogueCard({ speaker, lines, children, isChoice = false, prevN
 
 export default function Home() {
   const [step, setStep] = useState(0);
+  const [persistentAchievements] = useState<Achievement[]>(() => loadPermanentAchievements<Achievement[]>() ?? []);
   const { lang, setLang } = useLanguage();
   const t = UI[lang];
 
@@ -119,14 +128,12 @@ export default function Home() {
 
   const currentNode = localizedScript[step];
   const isFinished = step >= localizedScript.length - 1;
-  const hiddenEndingAchievement: Achievement[] = [
-    {
-      id: "ending_unremarkable",
-      title: "平庸之赐",
-      description: "你放弃了理解与控制世界的权力。在一个由选择构成的世界里，你选择了不再选择。",
-      unlockedAt: 0,
-    },
-  ];
+  useEffect(() => {
+    if (currentNode.type !== "achievement") return;
+    if (currentNode.text !== "平庸之赐 (The Gift of Being Unremarkable)" && currentNode.text !== "The Gift of Being Unremarkable (平庸之赐)") return;
+    if (persistentAchievements.some((item) => item.id === "ending_unremarkable")) return;
+    savePermanentAchievements([HIDDEN_ENDING_ACHIEVEMENT, ...persistentAchievements]);
+  }, [currentNode, persistentAchievements]);
 
   useEffect(() => {
     if (currentNode.autoPlayDuration) {
@@ -312,10 +319,10 @@ export default function Home() {
         {currentNode.type === "profile" && (
           <EconomicProfile
             choices={{}}
-            achievements={[]}
+            achievements={persistentAchievements}
             lang={lang}
             revealPersonality={false}
-            extraAchievements={hiddenEndingAchievement}
+            extraAchievements={[HIDDEN_ENDING_ACHIEVEMENT]}
           />
         )}
       </div>
