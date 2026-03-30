@@ -10,7 +10,8 @@ export type Achievement = {
 
 export type LogItem = {
     ts: number;
-    text: string;
+    zh: string;
+    en: string;
 };
 
 export type GameState = {
@@ -29,7 +30,7 @@ export function newGameState(startNodeId: string): GameState {
         stats: { ...INITIAL_STATS },
         choices: {},
         achievements: [],
-        log: [{ ts: Date.now(), text: "开始新游戏" }],
+        log: [{ ts: Date.now(), zh: "开始新游戏", en: "New Game Started" }],
         completedEvents: [], // 初始化为空
     };
 }

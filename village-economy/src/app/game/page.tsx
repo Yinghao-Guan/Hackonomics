@@ -119,8 +119,7 @@ function GamePageInner() {
         if (state.stats.actionPoints < apCost) return;
         let next: GameState = structuredClone(state);
         next.stats.actionPoints -= apCost;
-        const actionName = lang === "en" ? actionNameEn : actionNameZh;
-        next.log.unshift({ ts: Date.now(), text: `${t.actionPrefix}${actionName}` });
+        next.log.unshift({ ts: Date.now(), zh: `${UI.zh.actionPrefix}${actionNameZh}`, en: `${UI.en.actionPrefix}${actionNameEn}` });
         const result = applyEffects(next, effects, lang);
         setState(result.state);
         if (result.lastAchievementId) { setToastAchId(result.lastAchievementId); window.setTimeout(() => setToastAchId(null), 3500); }

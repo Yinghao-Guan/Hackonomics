@@ -24,7 +24,7 @@ export default function LogDrawer({
                     {log.map((item, index) => (
                         <div key={`${item.ts}-${index}`} className="rounded-xl bg-white/5 p-3 text-sm text-white/90 border border-white/5">
                             <div className="text-xs text-amber-500/50 mb-1">{new Date(item.ts).toLocaleString()}</div>
-                            <div className="leading-relaxed">{item.text}</div>
+                            <div className="leading-relaxed">{item[lang]}</div>
                         </div>
                     ))}
                 </div>

@@ -7,7 +7,7 @@ export type Effect =
     | { type: "add"; key: keyof GameStats; value: number }
     | { type: "set"; key: keyof GameStats; value: number }
     | { type: "achievement"; id: string; title: string; description: string }
-    | { type: "log"; text: string }
+    | { type: "log"; zh: string; en: string }
     | { type: "goto"; nodeId: string };
 
 export type GameStats = {
@@ -166,7 +166,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "set", key: "foodStock", value: 0 }, { type: "add", key: "productivity", value: -15 }, { type: "add", key: "gdp", value: -50 },
                     { type: "achievement", id: "ach_shared_hardship", title: "同甘共苦", description: "你选择让所有人一起撑过去。但在绝对稀缺下，平均分配导致了整体效率的下滑。" },
-                    { type: "log", text: "事件一：平均分配，全员轻微饥饿，生产力下降。" },
+                    { type: "log", zh: "事件一：平均分配，全员轻微饥饿，生产力下降。", en: "Event 1: Equal distribution — everyone slightly hungry, productivity declined." },
                     { type: "goto", nodeId: "event1_ending" },
                 ],
             },
@@ -175,7 +175,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "set", key: "foodStock", value: 0 }, { type: "add", key: "happiness", value: -25 }, { type: "add", key: "population", value: -2 }, { type: "add", key: "productivity", value: 10 },
                     { type: "achievement", id: "ach_optimal_question", title: "最优解？", description: "你把未来，放在了现在之前。效用最大化原则在极端情况下的冷血体现。" },
-                    { type: "log", text: "事件一：优先劳动力，老人小孩牺牲，幸福度大跌。" },
+                    { type: "log", zh: "事件一：优先劳动力，老人小孩牺牲，幸福度大跌。", en: "Event 1: Prioritize workers — elders and children sacrificed, happiness plummeted." },
                     { type: "goto", nodeId: "event1_ending" },
                 ],
             },
@@ -184,7 +184,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "set", key: "foodStock", value: 0 }, { type: "add", key: "productivity", value: -10 }, { type: "add", key: "happiness", value: -10 }, { type: "add", key: "population", value: -1 }, 
                     { type: "achievement", id: "ach_free_or_escape", title: "自由 or 逃避", description: "你选择了不替任何人做决定。体会哈耶克式自发秩序的代价吧。" },
-                    { type: "log", text: "事件一：不干预，引发轻度骚乱，结果差强人意。" },
+                    { type: "log", zh: "事件一：不干预，引发轻度骚乱，结果差强人意。", en: "Event 1: No intervention — minor unrest triggered, results were mediocre." },
                     { type: "goto", nodeId: "event1_ending" },
                 ],
             },
@@ -229,7 +229,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "happiness", value: -10 }, { type: "add", key: "actionPoints", value: -1 },
                     { type: "achievement", id: "ach_prudent_ruler", title: "未雨绸缪", description: "你强制储粮备荒。村民牢骚满腹，但仓库里堆满了应对灾害的储备。凯恩斯主义式的风险防范，代价是民心的短期流失。" },
-                    { type: "log", text: "事件二：强制储粮，幸福度下滑，行动点被仓库维护占用。" },
+                    { type: "log", zh: "事件二：强制储粮，幸福度下滑，行动点被仓库维护占用。", en: "Event 2: Forced grain storage — happiness declined, action points consumed by warehouse maintenance." },
                     { type: "goto", nodeId: "event2_ending" },
                 ],
             },
@@ -238,7 +238,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "foodStock", value: -30 }, { type: "add", key: "happiness", value: 30 }, { type: "add", key: "cpi", value: 15 },
                     { type: "achievement", id: "ach_utility_maximizer", title: "效用最大化", description: "肉类的香气飘遍全村，幸福度暴涨。但小麦储备大幅削减，下一场灾荒的缓冲期已大为缩短。" },
-                    { type: "log", text: "事件二：转化肉类，幸福度暴涨，但粮食储备锐减，推高CPI。" },
+                    { type: "log", zh: "事件二：转化肉类，幸福度暴涨，但粮食储备锐减，推高CPI。", en: "Event 2: Convert to meat — happiness soared, but grain reserves sharply depleted, CPI pushed higher." },
                     { type: "goto", nodeId: "event2_ending" },
                 ],
             },
@@ -247,7 +247,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: 500 }, { type: "add", key: "happiness", value: 10 }, { type: "add", key: "productivity", value: -15 }, { type: "add", key: "gdp", value: 40 },
                     { type: "achievement", id: "ach_invisible_hand", title: "看不见的手", description: "黑市自发形成，酒香四溢。金币滚滚而来，但清醒的劳动力却越来越少。奥地利学派的自发秩序，有时候味道像酒。" },
-                    { type: "log", text: "事件二：放开酿酒，收入增加但生产力下滑。" },
+                    { type: "log", zh: "事件二：放开酿酒，收入增加但生产力下滑。", en: "Event 2: Deregulate brewing — income increased but productivity declined." },
                     { type: "goto", nodeId: "event2_ending" },
                 ],
             },
@@ -292,7 +292,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "happiness", value: 10 }, { type: "add", key: "productivity", value: -20 }, { type: "add", key: "gdp", value: -80 }, { type: "set", key: "mineLevel", value: 0 },
                     { type: "achievement", id: "ach_iron_fist", title: "铁腕治河", description: "水质恢复，渔民欢呼雀跃。但木材产量暴跌，建筑升级成本急剧上升，经济发展停滞。公共利益至上，代价是发展的脚步。" },
-                    { type: "log", text: "事件三：颁布禁伐令，水质恢复，但木材断供导致矿场停摆，GDP下滑。" },
+                    { type: "log", zh: "事件三：颁布禁伐令，水质恢复，但木材断供导致矿场停摆，GDP下滑。", en: "Event 3: Logging ban — water quality restored, but timber shortage shut down mines, GDP declined." },
                     { type: "goto", nodeId: "event3_ending" },
                 ],
             },
@@ -301,7 +301,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: 1000 }, { type: "add", key: "happiness", value: -5 }, { type: "add", key: "cpi", value: 10 },
                     { type: "achievement", id: "ach_pigouvian", title: "庇古的算盘", description: "税金充盈财政，伐木速度趋于均衡，水质缓慢恢复。将外部成本内部化——让污染者为自己的代价买单。" },
-                    { type: "log", text: "事件三：征收庇古税，财政收入增加，污染放缓，但木材涨价推高CPI。" },
+                    { type: "log", zh: "事件三：征收庇古税，财政收入增加，污染放缓，但木材涨价推高CPI。", en: "Event 3: Pigouvian tax — fiscal revenue increased, pollution slowed, but timber price hike raised CPI." },
                     { type: "goto", nodeId: "event3_ending" },
                 ],
             },
@@ -310,7 +310,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: 400 }, { type: "add", key: "cpi", value: 20 }, { type: "add", key: "gdp", value: 100 }, { type: "add", key: "happiness", value: -10 },
                     { type: "achievement", id: "ach_coase_theorem", title: "科斯的手", description: "渔民获得产权后向伐木工索取污染赔偿，市场在剧烈博弈后自寻均衡。科斯定理：明晰产权，无需政府干预。" },
-                    { type: "log", text: "事件三：河流私有化，市场自发博弈导致物价波动，但长期促进GDP。" },
+                    { type: "log", zh: "事件三：河流私有化，市场自发博弈导致物价波动，但长期促进GDP。", en: "Event 3: River privatization — market spontaneous dynamics caused price fluctuations, but promoted GDP long-term." },
                     { type: "goto", nodeId: "event3_ending" },
                 ],
             },
@@ -355,7 +355,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "unemploymentRate", value: -25 }, { type: "add", key: "happiness", value: 20 }, { type: "add", key: "techLevel", value: -0.5 }, { type: "set", key: "academyLevel", value: 0 }, { type: "add", key: "gdp", value: -100 },
                     { type: "achievement", id: "ach_luddite", title: "卢德分子", description: "农夫们欢呼雀跃，广场重归平静。但新农具的碎片里，埋葬的是这个村庄本可拥有的未来。技术水平永久回退。" },
-                    { type: "log", text: "事件四：砸毁农具，失业率缓解。但研究院荒废，科技倒退，GDP永久受损。" },
+                    { type: "log", zh: "事件四：砸毁农具，失业率缓解。但研究院荒废，科技倒退，GDP永久受损。", en: "Event 4: Smashed tools — unemployment eased. But academy abandoned, tech regressed, GDP permanently damaged." },
                     { type: "goto", nodeId: "event4_ending" },
                 ],
             },
@@ -364,7 +364,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: -1500 }, { type: "add", key: "happiness", value: -5 }, { type: "add", key: "unemploymentRate", value: 10 }, { type: "add", key: "gdp", value: -30 }, { type: "add", key: "cpi", value: 10 },
                     { type: "achievement", id: "ach_welfare_state", title: "福利国家", description: "失业者领到了救济金，暂时喘了口气。但财政支出的窟窿越来越大，赤字危机已在暗处蓄势。这是凯恩斯主义的温情，也是它的软肋。" },
-                    { type: "log", text: "事件四：发放救济金，happiness受控，但巨额开支引发轻度通胀。" },
+                    { type: "log", zh: "事件四：发放救济金，happiness受控，但巨额开支引发轻度通胀。", en: "Event 4: Unemployment benefits — happiness stabilized, but massive spending triggered mild inflation." },
                     { type: "goto", nodeId: "event4_ending" },
                 ],
             },
@@ -373,7 +373,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "happiness", value: -30 }, { type: "add", key: "population", value: -2 }, { type: "add", key: "productivity", value: 30 }, { type: "add", key: "techLevel", value: 0.5 }, { type: "add", key: "gdp", value: 80 },
                     { type: "achievement", id: "ach_creative_destruction", title: "创造性破坏", description: "阵痛是真实的，哭声也是真实的。但熬过这个寒冬，失业者中诞生了铁匠、布匠和厨子——新的服务业就此萌芽。" },
-                    { type: "log", text: "事件四：放任市场清算，人口流失，剧烈痛苦，但换来生产力和科技的大幅跃升。" },
+                    { type: "log", zh: "事件四：放任市场清算，人口流失，剧烈痛苦，但换来生产力和科技的大幅跃升。", en: "Event 4: Market clearing — population loss, severe pain, but productivity and tech surged dramatically." },
                     { type: "goto", nodeId: "event4_ending" },
                 ],
             },
@@ -418,7 +418,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: 5000 }, { type: "add", key: "gdp", value: 200 }, { type: "add", key: "cpi", value: 60 }, { type: "add", key: "happiness", value: -15 },
                     { type: "achievement", id: "ach_money_printer", title: "印钞机轰鸣", description: "桥建好了，货物滚滚而来。但寡妇发现她攒的铜板，买不到以前一半的东西了。通货膨胀——文明最隐秘的税收。" },
-                    { type: "log", text: "事件五：量化宽松，GDP狂飙，但引发严重通货膨胀(CPI飙升)。" },
+                    { type: "log", zh: "事件五：量化宽松，GDP狂飙，但引发严重通货膨胀(CPI飙升)。", en: "Event 5: Quantitative easing — GDP soared, but triggered severe inflation (CPI spiked)." },
                     { type: "goto", nodeId: "event5_ending" },
                 ],
             },
@@ -427,7 +427,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "happiness", value: 5 }, { type: "add", key: "cpi", value: -20 }, { type: "add", key: "gdp", value: -50 }, { type: "add", key: "marketLevel", value: -1 },
                     { type: "achievement", id: "ach_gold_standard", title: "硬通货的尊严", description: "寡妇的铜板保住了购买力，村民对货币充满信任。但桥，依然没有建起来，河对岸的繁荣与这座村庄无缘。" },
-                    { type: "log", text: "事件五：坚守硬通货，拒绝放水。流动性枯竭导致市场降级。" },
+                    { type: "log", zh: "事件五：坚守硬通货，拒绝放水。流动性枯竭导致市场降级。", en: "Event 5: Hard currency defended — refused to print. Liquidity crunch caused market downgrade." },
                     { type: "goto", nodeId: "event5_ending" },
                 ],
             },
@@ -436,7 +436,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: 2000 }, { type: "add", key: "gdp", value: 100 }, { type: "add", key: "productivity", value: -40 }, { type: "add", key: "happiness", value: -15 }, { type: "set", key: "marketLevel", value: 0 },
                     { type: "achievement", id: "ach_expropriation", title: "征用令", description: "桥建好了，CPI纹丝不动。但商人们的眼神变了——谁还敢在这里积累财富？私人投资意愿跌入冰点。" },
-                    { type: "log", text: "事件五：强没收资产，无通胀，但摧毁了商业信任，市场直接荒废。" },
+                    { type: "log", zh: "事件五：强没收资产，无通胀，但摧毁了商业信任，市场直接荒废。", en: "Event 5: Asset expropriation — no inflation, but commercial trust destroyed, market collapsed entirely." },
                     { type: "goto", nodeId: "event5_ending" },
                 ],
             },
@@ -481,7 +481,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "happiness", value: 20 }, { type: "add", key: "productivity", value: -20 }, { type: "add", key: "actionPoints", value: -1 }, { type: "add", key: "gdp", value: -150 }, { type: "set", key: "mineLevel", value: 0 },
                     { type: "achievement", id: "ach_price_ceiling", title: "限价令", description: "农夫笑了，矿主停工了。价格压下去了，工具却消失了。供需曲线上，那片无谓损失（Deadweight Loss）触目惊心。" },
-                    { type: "log", text: "事件六：强制限价，民粹沸腾但矿场罢工荒废，GDP剧震。" },
+                    { type: "log", zh: "事件六：强制限价，民粹沸腾但矿场罢工荒废，GDP剧震。", en: "Event 6: Price ceiling — populist cheers but mine strike caused GDP to collapse." },
                     { type: "goto", nodeId: "event6_ending" },
                 ],
             },
@@ -490,7 +490,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: -2000 }, { type: "add", key: "mineLevel", value: 1 }, { type: "add", key: "gdp", value: 150 }, { type: "add", key: "happiness", value: 5 },
                     { type: "achievement", id: "ach_antitrust", title: "反垄断战争", description: "国库大出血，但竞争回来了。新矿山的铁，把垄断者从神坛上拉了下来。市场均衡，用公帑买的。" },
-                    { type: "log", text: "事件六：巨资扶持竞争者新建矿场，打破垄断，GDP健康成长。" },
+                    { type: "log", zh: "事件六：巨资扶持竞争者新建矿场，打破垄断，GDP健康成长。", en: "Event 6: Funded competitor mine — monopoly broken, GDP grew healthily." },
                     { type: "goto", nodeId: "event6_ending" },
                 ],
             },
@@ -499,7 +499,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "happiness", value: -30 }, { type: "add", key: "productivity", value: -10 }, { type: "add", key: "money", value: 1000 }, { type: "add", key: "cpi", value: 40 }, { type: "add", key: "gdp", value: 50 },
                     { type: "achievement", id: "ach_trickle_down", title: "涓滴效应", description: "农民在痛苦中熬着，矿主的财富堆成山。终于，他把钱投向了村庄的道路建设——涓滴效应，迟到的正义。" },
-                    { type: "log", text: "事件六：放任垄断剥削，税收暴增，但工具涨价致CPI暴涨，民怨极大。" },
+                    { type: "log", zh: "事件六：放任垄断剥削，税收暴增，但工具涨价致CPI暴涨，民怨极大。", en: "Event 6: Allowed monopoly — tax revenue surged, but tool price hike caused CPI spike, public anger massive." },
                     { type: "goto", nodeId: "event6_ending" },
                 ],
             },
@@ -544,7 +544,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: -1000 }, { type: "add", key: "gdp", value: 100 }, { type: "add", key: "happiness", value: 15 }, { type: "add", key: "cpi", value: 20 }, { type: "add", key: "marketLevel", value: 1 },
                     { type: "achievement", id: "ach_helicopter_money", title: "直升机撒钱", description: "消费券发出去，餐厅活下来了，GDP企稳了。但物价悄悄涨上去了——凯恩斯主义托底总需求，代价是日后的通胀。" },
-                    { type: "log", text: "事件七：花重金发放消费券托市，市场繁荣但引发通胀。" },
+                    { type: "log", zh: "事件七：花重金发放消费券托市，市场繁荣但引发通胀。", en: "Event 7: Consumer vouchers issued — market boomed but caused inflation." },
                     { type: "goto", nodeId: "event7_ending" },
                 ],
             },
@@ -553,7 +553,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "unemploymentRate", value: 30 }, { type: "add", key: "happiness", value: -20 }, { type: "add", key: "cpi", value: -30 }, { type: "add", key: "gdp", value: -150 }, { type: "add", key: "marketLevel", value: -2 },
                     { type: "achievement", id: "ach_liquidationist", title: "清算主义者", description: "餐厅倒了，失业者流落街头。但通货紧缩之后，物价回落，经济结构在剧痛中完成了自我修复。奥地利学派的处方，又苦又烈。" },
-                    { type: "log", text: "事件七：放任市场崩溃出清，市场降级，恶性通缩，失业潮爆发。" },
+                    { type: "log", zh: "事件七：放任市场崩溃出清，市场降级，恶性通缩，失业潮爆发。", en: "Event 7: Market liquidation — market downgraded, deflationary spiral, unemployment surge." },
                     { type: "goto", nodeId: "event7_ending" },
                 ],
             },
@@ -562,7 +562,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: -500 }, { type: "add", key: "actionPoints", value: -1 }, { type: "add", key: "happiness", value: 10 }, { type: "add", key: "productivity", value: -20 }, { type: "add", key: "gdp", value: 30 },
                     { type: "achievement", id: "ach_nationalization", title: "国有化", description: "餐厅没有倒，伙计们的工钱照发。但从今往后，这里每一道菜都要经过村长办公室审批。官僚主义的成本，你还没开始计算。" },
-                    { type: "log", text: "事件七：企业国有化保就业，但生产力大幅下滑，AP永久损耗。" },
+                    { type: "log", zh: "事件七：企业国有化保就业，但生产力大幅下滑，AP永久损耗。", en: "Event 7: Nationalization — employment saved, but productivity sharply declined, AP permanently lost." },
                     { type: "goto", nodeId: "event7_ending" },
                 ],
             },
@@ -607,7 +607,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "happiness", value: 30 }, { type: "add", key: "population", value: 1 }, { type: "add", key: "gdp", value: -50 }, { type: "add", key: "productivity", value: -20 }, { type: "add", key: "marketLevel", value: -1 },
                     { type: "achievement", id: "ach_progressive_tax", title: "北欧之梦", description: "水井建成，瘟疫解除。底层村民奔走相告，富商则暗暗心寒。二次分配缩小了贫富差距，但商业投资意愿，已悄然下滑。" },
-                    { type: "log", text: "事件八：累进税制杀富济贫，底层狂欢，但商业资本受惊撤离，市场降级。" },
+                    { type: "log", zh: "事件八：累进税制杀富济贫，底层狂欢，但商业资本受惊撤离，市场降级。", en: "Event 8: Progressive tax — lower class rejoiced, but capital fled, market downgraded." },
                     { type: "goto", nodeId: "event8_ending" },
                 ],
             },
@@ -616,7 +616,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "gdp", value: 50 }, { type: "add", key: "happiness", value: -30 }, { type: "add", key: "productivity", value: 10 }, { type: "add", key: "money", value: 1500 },
                     { type: "achievement", id: "ach_flat_tax", title: "税制中性", description: "水井建成，瘟疫解除。富商对税制满意，资本继续积累。但贫农的负担压垮了腰，阶层的裂缝，又深了一寸。" },
-                    { type: "log", text: "事件八：人头税剥削穷人，国库充盈，但极度加深阶级矛盾。" },
+                    { type: "log", zh: "事件八：人头税剥削穷人，国库充盈，但极度加深阶级矛盾。", en: "Event 8: Poll tax — treasury filled, but class conflict severely deepened." },
                     { type: "goto", nodeId: "event8_ending" },
                 ],
             },
@@ -625,7 +625,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "population", value: -5 }, { type: "add", key: "happiness", value: -40 }, { type: "add", key: "gdp", value: -80 },
                     { type: "achievement", id: "ach_free_rider", title: "搭便车者", description: "众筹失败了。每个人都等着别人先捐。水井没建成，瘟疫来了。财产权得到了捍卫，但代价是死人。这叫搭便车问题（Free Rider Problem）。" },
-                    { type: "log", text: "事件八：众筹修井彻底失败，瘟疫大爆发，人口暴减。" },
+                    { type: "log", zh: "事件八：众筹修井彻底失败，瘟疫大爆发，人口暴减。", en: "Event 8: Crowdfunding failed — plague erupted, population collapsed." },
                     { type: "goto", nodeId: "event8_ending" },
                 ],
             },
@@ -670,7 +670,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "happiness", value: 10 }, { type: "add", key: "gdp", value: -80 }, { type: "add", key: "productivity", value: -20 }, { type: "add", key: "techLevel", value: -0.3 },
                     { type: "achievement", id: "ach_protectionism", title: "锁国令", description: "铁匠的炉火没有熄灭。但村民们继续用着笨重的旧工具，效率低下，与山外的繁荣渐行渐远。保护，是有代价的温柔。" },
-                    { type: "log", text: "事件九：贸易禁令保护了本地矿场，但科技停滞，全村生产力被拖累。" },
+                    { type: "log", zh: "事件九：贸易禁令保护了本地矿场，但科技停滞，全村生产力被拖累。", en: "Event 9: Trade ban — local mine protected, but tech stagnated, village productivity dragged down." },
                     { type: "goto", nodeId: "event9_ending" },
                 ],
             },
@@ -679,7 +679,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: 2000 }, { type: "add", key: "gdp", value: 50 }, { type: "add", key: "cpi", value: 20 }, { type: "add", key: "happiness", value: -5 },
                     { type: "achievement", id: "ach_tariff", title: "关税壁垒", description: "国库丰盈，铁匠铺勉强维持，农民也得到了半价工具。没有人完全满意，没有人彻底受损——这就是妥协的艺术。" },
-                    { type: "log", text: "事件九：征收关税，国库大赚一笔，但抬高了工具成本，推高CPI。" },
+                    { type: "log", zh: "事件九：征收关税，国库大赚一笔，但抬高了工具成本，推高CPI。", en: "Event 9: Tariffs imposed — treasury profited, but tool costs raised, CPI pushed higher." },
                     { type: "goto", nodeId: "event9_ending" },
                 ],
             },
@@ -688,7 +688,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "set", key: "mineLevel", value: 0 }, { type: "add", key: "unemploymentRate", value: 20 }, { type: "add", key: "foodStock", value: 50 }, { type: "add", key: "techLevel", value: 0.5 }, { type: "add", key: "gdp", value: 150 },
                     { type: "achievement", id: "ach_comparative_advantage", title: "比较优势", description: "铁匠铺的炉火熄灭了，村里爆发了一波失业潮。但粮仓满得快溢出来，GDP飙升。李嘉图是对的——但他没有告诉你，该怎么面对那个失业的铁匠。" },
-                    { type: "log", text: "事件九：自由贸易开启，本地矿业全毁(矿场归0)，但换来科技跃迁与海量粮食。" },
+                    { type: "log", zh: "事件九：自由贸易开启，本地矿业全毁(矿场归0)，但换来科技跃迁与海量粮食。", en: "Event 9: Free trade opened — local mining destroyed (mine=0), but tech leaped and food stockpiled." },
                     { type: "goto", nodeId: "event9_ending" },
                 ],
             },
@@ -733,7 +733,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: 3000 }, { type: "add", key: "cpi", value: 80 }, { type: "add", key: "happiness", value: -20 }, { type: "add", key: "gdp", value: 80 }, { type: "add", key: "foodStock", value: -20 },
                     { type: "achievement", id: "ach_currency_war", title: "以牙还牙", description: "出口恢复了，滞销的麦子终于卖出去了。但每个村民口袋里的钱，也悄悄缩水了。竞争性贬值——一场没有赢家的底线竞争。" },
-                    { type: "log", text: "事件十：参与汇率战暴印钞票，保住农场出口，但引发超级通胀。" },
+                    { type: "log", zh: "事件十：参与汇率战暴印钞票，保住农场出口，但引发超级通胀。", en: "Event 10: Currency war — printed money to protect farm exports, but triggered hyperinflation." },
                     { type: "goto", nodeId: "event10_ending" },
                 ],
             },
@@ -742,7 +742,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "farmLevel", value: -2 }, { type: "add", key: "cpi", value: -30 }, { type: "add", key: "happiness", value: 10 }, { type: "add", key: "gdp", value: -80 },
                     { type: "achievement", id: "ach_strong_currency", title: "货币的尊严", description: "出口行业哀鸿遍野，但每一枚铜板的购买力，都坚挺如初。强势货币，是无声的宣言：我们不参与这场竞相堕落的游戏。" },
-                    { type: "log", text: "事件十：拒绝贬值，出口端惨遭屠杀，农场大面积倒闭，但平民购买力飞升。" },
+                    { type: "log", zh: "事件十：拒绝贬值，出口端惨遭屠杀，农场大面积倒闭，但平民购买力飞升。", en: "Event 10: Refused devaluation — exports devastated, farms collapsed, but civilian purchasing power soared." },
                     { type: "goto", nodeId: "event10_ending" },
                 ],
             },
@@ -751,7 +751,7 @@ export const NODES: Record<string, Node> = {
                 effects: [
                     { type: "add", key: "money", value: -3000 }, { type: "add", key: "techLevel", value: 0.5 }, { type: "add", key: "marketLevel", value: 2 }, { type: "add", key: "actionPoints", value: -2 }, { type: "add", key: "gdp", value: 120 },
                     { type: "achievement", id: "ach_monetary_union", title: "货币同盟", description: "汇率战永久终结，贸易畅通无阻。但代价是，你再也无法用印钞来解决任何国内危机了。权力，有时候需要你亲手交出去，才能换来真正的稳定。" },
-                    { type: "log", text: "事件十：建立货币联盟，丧失货币主权，但换取了超级大市场的终极繁荣。" },
+                    { type: "log", zh: "事件十：建立货币联盟，丧失货币主权，但换取了超级大市场的终极繁荣。", en: "Event 10: Monetary union — lost currency sovereignty, but gained access to a super-market's ultimate prosperity." },
                     { type: "goto", nodeId: "event10_ending" },
                 ],
             },
