@@ -440,14 +440,21 @@ function GamePageInner() {
                         </p>
                         {"next" in node && (node as { next?: string }).next ? (
                             <button
-                                onClick={() => { onContinue(); }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    onContinue();
+                                }}
                                 className="group relative overflow-hidden rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-10 py-4 text-lg font-medium text-white transition-all hover:bg-white/20 hover:scale-105 cursor-pointer"
                             >
                                 <span className="relative z-10">{lang === "en" ? "View Profile" : "查看人格档案"}</span>
                             </button>
                         ) : (
                             <button
-                                onClick={() => { clearStorage(); router.push("/"); }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    clearStorage();
+                                    router.push("/");
+                                }}
                                 className="group relative overflow-hidden rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-10 py-4 text-lg font-medium text-white transition-all hover:bg-white/20 hover:scale-105 cursor-pointer"
                             >
                                 <span className="relative z-10">{t.restart}</span>
